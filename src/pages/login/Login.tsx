@@ -3,6 +3,9 @@ import { Eye, EyeOff, User, Lock } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent } from '../../components/ui/card';
+import { useLoginUser } from './useLoginActions';
+
+import ButtonLoadingSpinner from '../../components/elements/ButtonLoadingSpinner';
 
 type Props = {
   // Define your props here
@@ -10,9 +13,19 @@ type Props = {
 
 const Login: React.FC<Props> = () => {
   const [showPassword, setShowPassword] = React.useState(false);
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const {mutate, isPending} = useLoginUser();
 
+  const onHandleLogin = () => {
+    const payload = {
+      email: username,
+      password: password
+    }
+   mutate(payload)
+  }
   return (
-    <div className="flex h-screen w-full bg-stone-100">
+    <div className="flex h-fit w-full bg-stone-100">
       {/* Left section - maroon welcome area */}
       <div className="hidden md:flex md:w-1/2 lg:w-2/5 bg-red-900 rounded-r-3xl flex-col justify-center items-center p-8 text-white">
         <div className="w-full max-w-md space-y-6">
@@ -20,7 +33,7 @@ const Login: React.FC<Props> = () => {
           <p className="text-sm opacity-80">Don't have an account?</p>
           <Button 
             variant="outline" 
-            className="border border-white text-white hover:bg-white/10 w-full max-w-xs"
+            className="border border-white text-red-900 hover:bg-white/10 w-full max-w-xs"
           >
             Register
           </Button>
@@ -28,15 +41,17 @@ const Login: React.FC<Props> = () => {
       </div>
 
       {/* Right section - login form */}
-      <div className="w-full md:w-1/2 lg:w-3/5 flex items-center justify-center p-4">
+      <div className="w-full md:w-[80%] lg:w-3/5 flex items-center justify-center p-1 md:p-4">
         <Card className="w-full max-w-md bg-transparent border-none shadow-none">
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-bold text-red-900 mb-6">Login</h2>
+          <CardContent className="p-2 md:p-6">
+            <h2 className="text-2xl font-bold text-red-900 mb-6">Login To Planora</h2>
             
             <div className="space-y-4">
               {/* Username field */}
               <div className="relative">
                 <Input 
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   type="text"
                   placeholder="Username"
                   className="pl-10 pr-4 py-6 bg-stone-200 border-none rounded-md text-red-900"
@@ -49,6 +64,8 @@ const Login: React.FC<Props> = () => {
               {/* Password field */}
               <div className="relative">
                 <Input 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}                
                   type={showPassword ? "text" : "password"}
                   placeholder="password"
                   className="pl-10 pr-10 py-6 bg-stone-200 border-none rounded-md text-red-900"
@@ -56,28 +73,31 @@ const Login: React.FC<Props> = () => {
                 <Lock 
                   className="absolute left-3 top-1/2 transform -translate-y-1/2 text-red-900 w-5 h-5" 
                 />
-                <button 
-                  type="button"
+                <div
+                  // type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-900"
+                  className="absolute bg-transparent right-3 top-1/2 transform -translate-y-1/2 text-red-900 cursor-pointer"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
+                </div>
               </div>
               
               {/* Forgot password link */}
               <div className="flex justify-end">
-                <a href="#" className="text-sm text-red-900 hover:underline">
+                <p className="text-xs cursor-pointer underline text-gray-500 font-medium hover:underline">
                   Forgot Password?
-                </a>
+                </p>
               </div>
               
               {/* Login button */}
-              <Button 
-                className="w-full py-6 bg-amber-200 hover:bg-amber-300 text-red-900 font-medium"
+              <Button
+                onClick={onHandleLogin}
+                disabled={isPending}
+                className="w-full py-6 bg-amber-200 hover:bg-amber-300 text-red-900 font-semibold border-2 border-red-900 rounded-md"
               >
-                Login
+                {isPending ? <ButtonLoadingSpinner/> : "Login"}
               </Button>
+
               
               {/* Social login section */}
               <div className="mt-4 text-center">

@@ -1,14 +1,18 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter } from 'react-router-dom';
+import MainRoute from './routes/MainRoute';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import './App.css';
+
+const queryClient = new QueryClient();
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
- <h1 className='text-red-600'>Welcome Home</h1>
-  )
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <MainRoute />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
 }
 
-export default App
+export default App;
