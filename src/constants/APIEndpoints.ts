@@ -3,7 +3,8 @@ import config from "../utils/config";
 export const BASE_URL_API = config.baseURL;
 
 export const APIENDPOINTS = {
-  LOGIN: `${BASE_URL_API}/accounts/api/v1/login/token`,
+  LOGIN: `${BASE_URL_API}/api/auth/login`,
+  REGISTER: `${BASE_URL_API}/api/auth/register`,
 };
 
 export const getAPIAUTHHEADERS = () => {

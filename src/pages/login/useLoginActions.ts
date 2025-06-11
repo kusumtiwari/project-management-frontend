@@ -3,6 +3,8 @@ import { useSessionStore } from "../../session/useSessionStore";
 import { request } from "../../utils/request";
 import { APIENDPOINTS } from "../../constants/APIEndpoints";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+
 
 interface LoginData {
   email: string;
@@ -33,8 +35,9 @@ export const useLoginUser = () => {
       if(
         response?.success ){
         console.log("Login successful:", response);
-        setToken(response.data.access);
-        navigate("/")
+        setToken(response.token);
+        toast.success("Login successful")
+        navigate("/");
       }
      else{
         console.log("Login failed:", response);
@@ -43,7 +46,22 @@ export const useLoginUser = () => {
     onError: (error: unknown) => {
       console.error("Login failed:", error);
       // Example: show error toast
-      // toast.error("Login failed. Please check your credentials.");
+      toast.error("Login failed. Please check your credentials.");
     },
+  });
+};
+
+export const useRegisterUser = () => {
+  return useMutation({
+    mutationFn: (data:any) => {
+      return request(APIENDPOINTS.REGISTER, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+    },
+
   });
 };
