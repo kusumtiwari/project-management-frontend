@@ -35,7 +35,7 @@ export const useLoginUser = () => {
       if(
         response?.success ){
         console.log("Login successful:", response);
-        setToken(response.token);
+        setToken(response?.profile?.token);
         toast.success("Login successful")
         navigate("/");
       }
