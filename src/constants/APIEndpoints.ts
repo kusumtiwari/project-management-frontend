@@ -5,6 +5,7 @@ export const BASE_URL_API = config.baseURL;
 export const APIENDPOINTS = {
   LOGIN: `${BASE_URL_API}/api/auth/login`,
   REGISTER: `${BASE_URL_API}/api/auth/register`,
+  PROJECTS: `${BASE_URL_API}/api/projects/`,
 };
 
 export const getAPIAUTHHEADERS = () => {

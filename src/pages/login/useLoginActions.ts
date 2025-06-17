@@ -19,7 +19,7 @@ interface LoginResponse {
 
 export const useLoginUser = () => {
   const navigate = useNavigate()
-  const { setToken } = useSessionStore();
+  const { setToken , setProfile} = useSessionStore();
 
   return useMutation({
     mutationFn: (data: LoginData) => {
@@ -35,6 +35,7 @@ export const useLoginUser = () => {
       if(
         response?.success ){
         console.log("Login successful:", response);
+        setProfile(response?.profile);
         setToken(response?.profile?.token);
         toast.success("Login successful")
         navigate("/");
@@ -45,7 +46,6 @@ export const useLoginUser = () => {
     },
     onError: (error: unknown) => {
       console.error("Login failed:", error);
-      // Example: show error toast
       toast.error("Login failed. Please check your credentials.");
     },
   });

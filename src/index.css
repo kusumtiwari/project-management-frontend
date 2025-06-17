@@ -2,3 +2,18 @@
 @import "tw-animate-css";
 
 
+body.light {
+    --bg-color: white;
+    --text-color: #1a1a1a;
+}
+
+body.dark {
+    --bg-color: #1a1a1a;
+    --text-color: white;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}

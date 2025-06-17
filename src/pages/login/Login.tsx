@@ -25,7 +25,7 @@ const Login: React.FC<Props> = () => {
 
   const onHandleLogin = () => {
     const payload = {
-      email: username,
+      email: email,
       password: password
     }
     mutate(payload)
@@ -111,15 +111,16 @@ const Login: React.FC<Props> = () => {
 
               <div className="space-y-4">
                 {/* Username field */}
+              
                 <div className="relative">
                   <Input
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    type="text"
-                    placeholder="Username"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    type="email"
+                    placeholder="Email"
                     className="pl-10 pr-4 py-6 bg-stone-200 border-none rounded-md text-red-900"
                   />
-                  <User
+                  <Mail
                     className="absolute left-3 top-1/2 transform -translate-y-1/2 text-red-900 w-5 h-5"
                   />
                 </div>
@@ -128,13 +129,13 @@ const Login: React.FC<Props> = () => {
                 {isRegisterMode && (
                   <div className="relative">
                     <Input
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      type="email"
-                      placeholder="Email"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      type="text"
+                      placeholder="Username"
                       className="pl-10 pr-4 py-6 bg-stone-200 border-none rounded-md text-red-900"
                     />
-                    <Mail
+                    <User
                       className="absolute left-3 top-1/2 transform -translate-y-1/2 text-red-900 w-5 h-5"
                     />
                   </div>

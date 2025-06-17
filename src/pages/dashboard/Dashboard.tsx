@@ -63,7 +63,7 @@ const Dashboard: React.FC = () => {
     }
   };
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
+      <div className="min-h-screen">
         <div className="max-w-7xl mx-auto">
           {/* Header Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
