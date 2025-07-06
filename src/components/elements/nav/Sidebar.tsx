@@ -7,13 +7,13 @@ const Sidebar: React.FC = () => {
 
   return (
     <aside className="w-64 shadow h-full p-4 border-r-0.5">
-      <h2 className="text-xl font-bold mb-6">Planora</h2>
+      <h2 className="text-xl font-bold mb-6 ">Planora</h2>
       <nav className="space-y-4">
         {navigationItems.map(({ title, route, icon: Icon }, idx) => (
           <div
             key={idx}
             onClick={() => navigate(route)}
-            className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded cursor-pointer"
+            className="flex items-center gap-3 p-2 rounded cursor-pointer"
           >
             <Icon className="w-5 h-5" />
             <span>{title}</span>

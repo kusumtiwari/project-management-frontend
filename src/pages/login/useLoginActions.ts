@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useSessionStore } from "../../session/useSessionStore";
 import { request } from "../../utils/request";
-import { APIENDPOINTS } from "../../constants/APIEndpoints";
+import { APIENDPOINTS, getAPIAUTHHEADERS } from "../../constants/APIEndpoints";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -36,7 +36,7 @@ export const useLoginUser = () => {
         response?.success ){
         console.log("Login successful:", response);
         setProfile(response?.profile);
-        setToken(response?.profile?.token);
+        setToken(response?.token);
         toast.success("Login successful")
         navigate("/");
       }
@@ -52,6 +52,7 @@ export const useLoginUser = () => {
 };
 
 export const useRegisterUser = () => {
+  const { setToken, setProfile } = useSessionStore();
   return useMutation({
     mutationFn: (data:any) => {
       return request(APIENDPOINTS.REGISTER, {
@@ -62,6 +63,35 @@ export const useRegisterUser = () => {
         body: JSON.stringify(data),
       });
     },
+    onSuccess: (response:any) => {
+      if (response?.success) {
+        console.log("Registration successful:", response);
+        setProfile(response?.profile);
+        setToken(response?.token);
+        toast.success("Registration successful");
+      } else {
+        console.log("Registration failed:", response);
+        toast.error("Registration failed. Please check your information.");
+      }
+    }
+  });
+};
+
+export const useTeamSetup = () => {
+  const token = useSessionStore((state) => state?.token);
+console.log(token,'token')
+  const mutation = useMutation({
+    mutationFn: (data: any) => {
+      return request(APIENDPOINTS.TEAMSETUP, {
+        method: "POST",
+        headers: getAPIAUTHHEADERS(),
+        body: JSON.stringify(data),
+      });
+    },
 
   });
+
+  console.log("useTeamSetup hook initialized"); // Less confusing log
+
+  return mutation;
 };
