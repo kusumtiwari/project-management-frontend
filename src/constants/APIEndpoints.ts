@@ -8,6 +8,7 @@ export const APIENDPOINTS = {
   REGISTER: `${BASE_URL_API}/api/auth/register`,
   PROJECTS: `${BASE_URL_API}/api/projects/`,
   TEAMSETUP : `${BASE_URL_API}/api/teams/`,
+  VERIFY_EMAIL: `${BASE_URL_API}/api/auth/verify-email`,
 };
 
 export const getAPIAUTHHEADERS = () => {

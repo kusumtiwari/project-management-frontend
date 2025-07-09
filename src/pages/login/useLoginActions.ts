@@ -95,3 +95,29 @@ console.log(token,'token')
 
   return mutation;
 };
+
+export const useVerifyEmail = () => {
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: (token: string) => {
+      // Call backend verify endpoint with token as query param
+      return request(`${APIENDPOINTS.VERIFY_EMAIL}?token=${token}`, {
+        method: "GET",
+      });
+    },
+    onSuccess: (response: any) => {
+      if (response?.success) {
+        toast.success("Email verified successfully!");
+        // Redirect to login or homepage after verification
+        navigate("/login");
+      } else {
+        toast.error(response?.message || "Verification failed");
+      }
+    },
+    onError: (error: any) => {
+      toast.error("Verification failed. Please try again.");
+      console.error("Verify email error:", error);
+    },
+  });
+};

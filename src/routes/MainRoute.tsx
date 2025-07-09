@@ -1,5 +1,4 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
 import { Routes, Route } from 'react-router-dom';
 import Layout from '../layout/Layout';
 import Login from '../pages/login/Login';
@@ -8,6 +7,7 @@ import ProjectRoutes from './ProjectRoutes';
 import ProtectedRoute from './ProtectedRoute';
 import Signup from '../pages/signup/Signup';
 import TeamSetup from '../pages/teams/TeamSetup';
+import VerifyEmail from '@/pages/verify-email/VerifyEmail';
 type Props = {
   // Define your props here
 }
@@ -18,6 +18,7 @@ const MainRoute: React.FC<Props> = ({  }) => {
       {/* Public Route: Login */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
 
       {/* Protected Routes wrapped with ProtectedRoute */}
       <Route element={<ProtectedRoute/>}>

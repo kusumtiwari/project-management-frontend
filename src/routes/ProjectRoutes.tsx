@@ -11,7 +11,6 @@ const ProjectRoutes: React.FC<Props> = () => {
     return (
         <Routes>
             {/* Parent route for projects */}
-  
                 <Route index element={<Projects />} />
                 <Route path=":projectId" element={<ProjectDetails />} />
                 {/* Add more nested project-related routes here if needed */}

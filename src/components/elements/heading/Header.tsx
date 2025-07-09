@@ -1,13 +1,16 @@
 import React from 'react';
 
 type Props = {
-  // Define your props here
-  text: string
-}
+  text: string;
+  rightContent?: any;  // optional prop to accept JSX
+};
 
-const Header: React.FC<Props> = ({text}) => {
+const Header: React.FC<Props> = ({ text, rightContent }) => {
   return (
-    <h1 className='text-primary-400 text-xl font-semibold'>{text}</h1>
+    <div className="flex justify-between items-center">
+      <h1 className="text-primary text-xl font-semibold">{text}</h1>
+      {rightContent && <div>{rightContent}</div>}
+    </div>
   );
 };
 

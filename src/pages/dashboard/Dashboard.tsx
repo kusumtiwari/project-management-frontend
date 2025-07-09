@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '../../components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
-import { ChevronDown, ChevronUp, Users, CheckCircle, Clock, AlertTriangle, TrendingUp, Calendar, Target, Zap } from 'lucide-react';
+import {  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { ChevronDown, ChevronUp, Users, CheckCircle, Clock, TrendingUp, Calendar, Target, Zap } from 'lucide-react';
 
 const tasksOverTime = [
   { name: 'Jan', tasks: 40, completed: 35, inProgress: 5 },

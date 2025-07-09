@@ -7,7 +7,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <aside className="w-64 shadow h-full p-4 border-r-0.5">
-      <h2 className="text-xl font-bold mb-6 ">Planora</h2>
+      <h2 className="text-2xl font-bold mb-6 ">Planora</h2>
       <nav className="space-y-4">
         {navigationItems.map(({ title, route, icon: Icon }, idx) => (
           <div
