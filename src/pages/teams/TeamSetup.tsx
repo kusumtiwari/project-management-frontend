@@ -41,7 +41,7 @@ const TeamSetup: React.FC<Props> = ({ onSkip }) => {
     return (
         <div className="flex h-screen w-screen justify-center items-center bg-stone-100">
             {/* Main centered container */}
-            <div className="flex w-full max-w-4xl h-[80%] shadow-2xl rounded overflow-hidden">
+            <div className="flex w-full max-w-4xl h-[80%]  rounded overflow-hidden">
 
                 {/* Left section - maroon welcome area */}
                 <div className="hidden md:flex md:w-[45%] bg-red-900 flex-col justify-center items-center p-8 text-white overflow-hidden relative">
@@ -89,12 +89,12 @@ const TeamSetup: React.FC<Props> = ({ onSkip }) => {
                                         onChange={(e) => setTeamName(e.target.value)}
                                         type="text"
                                         placeholder="Enter your team name"
-                                        className="pl-10 pr-4 py-6 bg-stone-200 border-none rounded-md text-red-900 placeholder:text-stone-500"
+                                        className="pl-10 pr-4 py-6 bg-stone-200 border-none rounded-md placeholder:text-stone-500"
                                         maxLength={50}
                                         required
                                     />
                                     <Users
-                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-red-900 w-5 h-5"
+                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5"
                                     />
                                 </div>
 

@@ -35,24 +35,23 @@ async function checkStatus(response: Response): Promise<Response> {
 export async function request<T>(
   url: string,
   options?: RequestInit
-): Promise<T> {
+): Promise<{ status: number; data: T }> {
   try {
-    const response = await fetch(url, options); // Original response object
+    const response = await fetch(url, options);
 
-    // checkStatus will throw if !response.ok. If it does, the original 'response'
-    // object's body will *not* have been consumed by parseJSON.
-    await checkStatus(response);
+    await checkStatus(response); // Will throw if !response.ok
 
-    // If checkStatus passes (response.ok is true), then parseJSON consumes the body.
-    // At this point, checkStatus didn't consume the body (because it only does so if !response.ok)
-    return await parseJSON<T>(response);
+    const data = await parseJSON<T>(response);
+
+    return { status: response.status, data };
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error("Request failed:", (error as any).details || error.message);
-      throw error; // Re-throw the structured error
+      throw error;
     } else {
       console.error("Request failed with an unknown error:", error);
       throw new Error("An unknown error occurred during the request.");
     }
   }
 }
+

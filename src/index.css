@@ -81,7 +81,7 @@
 body.light {
     --bg-color: oklch(0.98 0.01 20);
     /* Soft maroon tint background */
-    --text-color: oklch(0.3 0.1 20);
+    --text-color: black;
     /* Maroonish text */
     --accent-color: oklch(0.84 0.2 85);
     /* Orangish-yellow */

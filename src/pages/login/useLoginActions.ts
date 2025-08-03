@@ -41,10 +41,11 @@ export const useLoginUser = () => {
         navigate("/");
       }
      else{
-        console.log("Login failed:", response);
+        // console.log("Login failed:", response);
      }
     },
     onError: (error: unknown) => {
+      console.log('inside of on error')
       console.error("Login failed:", error);
       toast.error("Login failed. Please check your credentials.");
     },
@@ -52,7 +53,8 @@ export const useLoginUser = () => {
 };
 
 export const useRegisterUser = () => {
-  const { setToken, setProfile } = useSessionStore();
+  // const { setToken, setProfile } = useSessionStore();
+  const navigate = useNavigate();
   return useMutation({
     mutationFn: (data:any) => {
       return request(APIENDPOINTS.REGISTER, {
@@ -66,13 +68,20 @@ export const useRegisterUser = () => {
     onSuccess: (response:any) => {
       if (response?.success) {
         console.log("Registration successful:", response);
-        setProfile(response?.profile);
-        setToken(response?.token);
-        toast.success("Registration successful");
+        // setProfile(response?.profile);
+        // setToken(response?.token);
+        toast.success(response?.message);
+        navigate('/verify-info');
+
       } else {
         console.log("Registration failed:", response);
-        toast.error("Registration failed. Please check your information.");
+        toast.error(response?.message);
       }
+    },
+
+    onError: (response:any) => {
+      console.error("Registration failed:", response);
+      toast.error(response?.message);
     }
   });
 };
@@ -98,6 +107,7 @@ console.log(token,'token')
 
 export const useVerifyEmail = () => {
   const navigate = useNavigate();
+  const { setToken } = useSessionStore();
 
   return useMutation({
     mutationFn: (token: string) => {
@@ -109,10 +119,9 @@ export const useVerifyEmail = () => {
     onSuccess: (response: any) => {
       if (response?.success) {
         toast.success("Email verified successfully!");
+        setToken(response?.token);
         // Redirect to login or homepage after verification
-        navigate("/login");
-      } else {
-        toast.error(response?.message || "Verification failed");
+        navigate("/team-setup");
       }
     },
     onError: (error: any) => {
