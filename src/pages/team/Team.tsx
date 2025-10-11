@@ -14,7 +14,7 @@ type Props = {
 const TeamMembers: React.FC<Props> = ({ }) => {
   // const { data } = useFetchTeamMembers();
   const { isOpen, openModal, closeModal, setIsOpen } = useModal();
-  const { mutate:sendInvitation, isPending } = useSendInvitation();
+  const { mutate: sendInvitation, isPending } = useSendInvitation(closeModal);
 
   const submitHandler = (e:React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

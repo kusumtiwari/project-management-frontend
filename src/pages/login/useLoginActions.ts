@@ -4,6 +4,7 @@ import { request } from "../../utils/request";
 import { APIENDPOINTS, getAPIAUTHHEADERS } from "../../constants/APIEndpoints";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { handleAPIResponse } from "../../utils/handleAPIResponse";
 
 
 interface LoginData {
@@ -30,20 +31,23 @@ export const useLoginUser = () => {
         },
         body: JSON.stringify(data),
       });
-    },
-    onSuccess: (response:any) => {
-      if(
-        response?.success ){
-        console.log("Login successful:", response);
-        setProfile(response?.profile);
-        setToken(response?.token);
-        toast.success("Login successful")
+        },
+    onSuccess: (response: any) => {
+      const { status, data } = response;
+      const apiResult = handleAPIResponse(status, data?.message);
+
+      if (apiResult.success && data?.success) {
+        console.log("Login successful:", data);
+        setProfile(data.profile);
+        setToken(data.token);
+        toast.success(apiResult.message); // Show toast with handled message
         navigate("/");
+      } else {
+        console.log("Login failed:", apiResult.message);
+        toast.error(apiResult.message);
       }
-     else{
-        // console.log("Login failed:", response);
-     }
     },
+
     onError: (error: unknown) => {
       console.log('inside of on error')
       console.error("Login failed:", error);

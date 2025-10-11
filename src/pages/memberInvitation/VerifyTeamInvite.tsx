@@ -8,17 +8,20 @@ import { Button } from "@/components/ui/button";
 import ButtonLoadingSpinner from "@/components/elements/ButtonLoadingSpinner";
 import { useVerifyTeamMember } from "./useVerifyTeamMember";
 import { useRegisterInvitedMember } from "./useVerifyTeamMember";
+import { handleAPIResponse } from "@/utils/handleAPIResponse"; // Make sure it's imported
 
 const VerifyTeamInvite: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get("token");
-  const [email, setEmail] = useState("");
-
   const [verificationSuccess, setVerificationSuccess] = useState(false);
+  const [verificationError, setVerificationError] = useState(false);
+
+  const { mutate: verify, isPending: verifying } = useVerifyTeamMember();
+  const { mutate: register, isPending: registering } = useRegisterInvitedMember();
+
   const methods = useForm({
     defaultValues: {
-      email: "",
       name: "",
       password: "",
       confirmPassword: "",
@@ -31,23 +34,29 @@ const VerifyTeamInvite: React.FC = () => {
     getValues,
   } = methods;
 
-  const { mutate: verify, isPending: verifying } = useVerifyTeamMember({
-    onSuccess: (data: any) => {
-      setEmail(data?.email);
-      methods.setValue("email", data?.email);
-      setVerificationSuccess(true);
-    },
-    onError: () => {
-      toast.error("Invalid or expired invite.");
-      setVerificationSuccess(false);
-    },
-  });
-
-  const { mutate: register, isPending: registering } = useRegisterInvitedMember();
-
   useEffect(() => {
     if (token) {
-      verify(token);
+      verify(token, {
+        onSuccess: (response: any) => {
+          const { status, message} = response;
+          const result = handleAPIResponse(status, message);
+
+          if (result.success) {
+            toast.success(result.message);
+            setVerificationSuccess(true);
+          } else {
+            toast.error(result.message);
+            setVerificationError(true);
+          }
+        },
+        onError: (error: any) => {
+          toast.error("Verification failed. Please try again");
+          console.error("Verify email error:", error);
+          setVerificationError(true);
+        },
+      });
+    } else {
+      setVerificationError(true);
     }
   }, [token]);
 
@@ -56,9 +65,10 @@ const VerifyTeamInvite: React.FC = () => {
       toast.error("Passwords do not match");
       return;
     }
+    const { confirmPassword, ...submitData } = data;
 
     register(
-      { ...data, token },
+      { ...submitData, token },
       {
         onSuccess: (res: any) => {
           toast.success(res?.message || "Account created successfully!");
@@ -74,17 +84,21 @@ const VerifyTeamInvite: React.FC = () => {
   if (verifying) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <span className="text-lg font-semibold">Verifying invite...</span>
+        <span className="text-lg font-semibold">Verifying invitation...</span>
+      </div>
+    );
+  }
+
+  if (verificationError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-red-600 text-lg font-semibold">
+        Invalid or expired invitation link.
       </div>
     );
   }
 
   if (!verificationSuccess) {
-    return (
-      <div className="flex items-center justify-center min-h-screen text-red-500">
-        Invalid or expired invite.
-      </div>
-    );
+    return null; // Don't show anything until verification completes
   }
 
   return (
@@ -94,16 +108,7 @@ const VerifyTeamInvite: React.FC = () => {
 
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <Input
-              name="email"
-              label="Email"
-              type="email"
-              disabled
-              leftIcon={<Mail size={18} />}
-              rules={{ required: "Email is required" }}
-              error={errors.email?.message}
-            />
-
+          
             <Input
               name="name"
               label="Name"
@@ -139,11 +144,6 @@ const VerifyTeamInvite: React.FC = () => {
               type="password"
               placeholder="Confirm your password"
               leftIcon={<Lock size={18} />}
-              rules={{
-                required: "Please confirm your password",
-                validate: (value) =>
-                  value === getValues("password") || "Passwords do not match",
-              }}
               error={errors.confirmPassword?.message}
             />
 

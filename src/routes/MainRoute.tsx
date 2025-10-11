@@ -6,7 +6,7 @@ import Dashboard from '../pages/dashboard/Dashboard';
 import ProjectRoutes from './ProjectRoutes';
 import ProtectedRoute from './ProtectedRoute';
 import Signup from '../pages/signup/Signup';
-import TeamSetup from '../pages/teams/TeamSetup';
+// import TeamSetup from '../pages/teams/TeamSetup';
 import VerifyEmail from '@/pages/verify-email/VerifyEmail';
 import SuccessMsg from '@/pages/successMsg/SuccessMsg';
 import TeamMemberRoute from './TeamMemberRoute';
@@ -27,7 +27,7 @@ const MainRoute: React.FC<Props> = ({  }) => {
 
       {/* Protected Routes wrapped with ProtectedRoute */}
       <Route element={<ProtectedRoute/>}>
-       <Route path='/team-setup' element={<TeamSetup/>}></Route>
+       {/* <Route path='/team-setup' element={<TeamSetup/>}></Route> */}
         {/* Routes with shared layout */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />

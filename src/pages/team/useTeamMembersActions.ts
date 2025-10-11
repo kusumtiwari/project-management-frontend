@@ -17,7 +17,7 @@ export const useFetchTeamMembers = () => {
     });
 };
 
-export const useSendInvitation = () => {
+export const useSendInvitation = (onSuccessCallback?: () => void) => {
   return useMutation({
     mutationFn: (data: any) =>
       request(`${APIENDPOINTS.INVITE_MEMBERS}`, {
@@ -29,8 +29,10 @@ export const useSendInvitation = () => {
     onSuccess: (response: any) => {
       const { status, message } = response;
       const result = handleAPIResponse(status, message);
+
       if (result.success) {
         toast.success(result.message);
+        onSuccessCallback?.(); // Close modal if provided
       } else {
         toast.error(result.message);
       }
