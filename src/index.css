@@ -9,97 +9,39 @@
     /* Breakpoints */
     --breakpoint-3xl: 1920px;
 
-    /* Primary Maroon Palette - Light Mode */
-    --color-primary-50: oklch(0.98 0.01 20);
-    --color-primary-100: oklch(0.94 0.04 20);
-    --color-primary-200: oklch(0.88 0.06 20);
-    --color-primary-300: oklch(0.78 0.1 20);
-    --color-primary-400: oklch(0.7 0.14 20);
-    --color-primary-500: oklch(0.58 0.18 20);
-    /* Maroon Core */
-    --color-primary-600: oklch(0.46 0.18 20);
-    --color-primary-700: oklch(0.38 0.16 20);
-    --color-primary-800: oklch(0.3 0.14 20);
-    --color-primary-900: oklch(0.22 0.12 20);
-    --color-primary-950: oklch(0.18 0.08 20);
+    /* Neutral primary palette (gray/neutral) for both themes via tokens) */
+    --color-primary-50: #f9fafb;
+    --color-primary-100: #f3f4f6;
+    --color-primary-200: #e5e7eb;
+    --color-primary-300: #d1d5db;
+    --color-primary-400: #9ca3af;
+    --color-primary-500: #6b7280;
+    --color-primary-600: #4b5563;
+    --color-primary-700: #374151;
+    --color-primary-800: #1f2937;
+    --color-primary-900: #111827;
+    --color-primary-950: #0b1220;
 
-    /* Accent Orange/Yellow */
-    --color-accent-100: oklch(0.96 0.12 85);
-    --color-accent-300: oklch(0.9 0.16 85);
-    --color-accent-500: oklch(0.84 0.2 85);
-    /* Orange Core */
-    --color-accent-700: oklch(0.7 0.2 85);
+    /* Neutral accent palette (blue-gray) */
+    --color-accent-100: #e0f2fe;
+    --color-accent-300: #7dd3fc;
+    --color-accent-500: #38bdf8;
+    --color-accent-700: #0284c7;
 
     /* Easing functions */
     --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
     --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
 }
-@media (prefers-color-scheme: dark) {
-    @theme {
-        --color-primary-50: oklch(0.85 0.05 20);
-        --color-primary-100: oklch(0.78 0.07 20);
-        --color-primary-200: oklch(0.7 0.09 20);
-        --color-primary-300: oklch(0.62 0.11 20);
-        --color-primary-400: oklch(0.55 0.13 20);
-        --color-primary-500: oklch(0.48 0.15 20);
-        --color-primary-600: oklch(0.42 0.15 20);
-        --color-primary-700: oklch(0.36 0.13 20);
-        --color-primary-800: oklch(0.3 0.11 20);
-        --color-primary-900: oklch(0.25 0.09 20);
-        --color-primary-950: oklch(0.2 0.07 20);
 
-        --color-accent-100: oklch(0.97 0.09 85);
-        --color-accent-300: oklch(0.93 0.12 85);
-        --color-accent-500: oklch(0.88 0.15 85);
-        --color-accent-700: oklch(0.82 0.17 85);
-    }
-}
-
-/* Optional Manual Dark Mode */
-.dark {
-    @theme {
-        --color-primary-50: oklch(0.85 0.05 20);
-        --color-primary-100: oklch(0.78 0.07 20);
-        --color-primary-200: oklch(0.7 0.09 20);
-        --color-primary-300: oklch(0.62 0.11 20);
-        --color-primary-400: oklch(0.55 0.13 20);
-        --color-primary-500: oklch(0.48 0.15 20);
-        --color-primary-600: oklch(0.42 0.15 20);
-        --color-primary-700: oklch(0.36 0.13 20);
-        --color-primary-800: oklch(0.3 0.11 20);
-        --color-primary-900: oklch(0.25 0.09 20);
-        --color-primary-950: oklch(0.2 0.07 20);
-
-        --color-accent-100: oklch(0.97 0.09 85);
-        --color-accent-300: oklch(0.93 0.12 85);
-        --color-accent-500: oklch(0.88 0.15 85);
-        --color-accent-700: oklch(0.82 0.17 85);
-    }
-}
-
-/* Light Mode */
-body.light {
-    --bg-color: oklch(0.98 0.01 20);
-    /* Soft maroon tint background */
-    --text-color: black;
-    /* Maroonish text */
-    --accent-color: oklch(0.84 0.2 85);
-    /* Orangish-yellow */
-}
-
-/* Dark Mode */
-body.dark {
-    --bg-color: oklch(0.2 0.04 20);
-    /* Darker maroon bg */
-    --text-color: oklch(0.95 0.08 85);
-    /* Light orange-yellow text */
-    --accent-color: oklch(0.93 0.12 85);
-    /* Brightened accent */
-}
-
-/* Shared */
+/* Base colors (light) */
 body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    background-color: #ffffff;
+    color: #111827; /* gray-900 */
     transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark mode class (toggled on html by ThemeToggle) */
+.dark body {
+    background-color: #0a0a0a; /* near-black */
+    color: #e5e7eb; /* gray-200 */
 }

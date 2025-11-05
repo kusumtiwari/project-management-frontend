@@ -1,20 +1,20 @@
-import React from 'react';
-import { Outlet, Routes, Route } from 'react-router-dom';
-import Projects from '../pages/projects/Projects';
-import ProjectDetails from '../pages/projects/ProjectDetails';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import Projects from "../pages/projects/Projects";
+import ProjectDetails from "../pages/projects/ProjectDetails";
+import ProjectTasks from "@/pages/projectTasks/ProjectTasks";
 
-type Props = {
-    // you can define any props if needed, otherwise keep empty
-}
-
-const ProjectRoutes: React.FC<Props> = () => {
+const ProjectRoutes: React.FC = () => {
     return (
         <Routes>
-            {/* Parent route for projects */}
-                <Route index element={<Projects />} />
-                <Route path=":projectId" element={<ProjectDetails />} />
-                {/* Add more nested project-related routes here if needed */}
-         
+            {/* /projects */}
+            <Route index element={<Projects />} />
+
+            {/* /projects/:id */}
+            <Route path=":id" element={<ProjectDetails />} />
+
+            {/* /project/task/:id */}
+            <Route path="/tasks/:id" element={<ProjectTasks />} />
         </Routes>
     );
 };

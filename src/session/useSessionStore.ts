@@ -4,6 +4,13 @@ import { persist } from "zustand/middleware";
 interface UserProfile {
   username: string;
   email: string;
+  isAdmin?: boolean;
+  teams?: Array<{
+    teamId: string;
+    teamName: string;
+    role: 'admin' | 'member';
+    joinedAt: string;
+  }>;
 }
 
 interface SessionStoreState {

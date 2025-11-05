@@ -10,7 +10,8 @@ import Signup from '../pages/signup/Signup';
 import VerifyEmail from '@/pages/verify-email/VerifyEmail';
 import SuccessMsg from '@/pages/successMsg/SuccessMsg';
 import TeamMemberRoute from './TeamMemberRoute';
-import VerifyTeamInvite from '@/pages/memberInvitation/VerifyTeamInvite';
+import RolesRoutes from './RolesRoute';
+
 type Props = {
   // Define your props here
 }
@@ -23,7 +24,7 @@ const MainRoute: React.FC<Props> = ({  }) => {
       <Route path="/signup" element={<Signup />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/verify-info" element={<SuccessMsg />} />
-      <Route path='/invite' element={<VerifyTeamInvite/>} />
+      {/* Email-based invite flow removed */}
 
       {/* Protected Routes wrapped with ProtectedRoute */}
       <Route element={<ProtectedRoute/>}>
@@ -32,6 +33,7 @@ const MainRoute: React.FC<Props> = ({  }) => {
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="projects/*" element={<ProjectRoutes />} />
+          <Route path="roles/*" element={<RolesRoutes />} />
           <Route path="team-members/*" element={<TeamMemberRoute />} />
           {/* Add more protected nested routes here */}
         </Route>

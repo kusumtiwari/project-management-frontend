@@ -7,11 +7,13 @@ export const APIENDPOINTS = {
   LOGIN: `${BASE_URL_API}/api/auth/login`,
   REGISTER: `${BASE_URL_API}/api/auth/register`,
   PROJECTS: `${BASE_URL_API}/api/projects/`,
+  TASK: `${BASE_URL_API}/api/tasks/`,
   TEAMSETUP: `${BASE_URL_API}/api/teams/`,
   VERIFY_EMAIL: `${BASE_URL_API}/api/auth/verify-email`,
-  VERITY_TEAM_MEMBER: `${BASE_URL_API}/api/auth/verify-team-member/`,
-  INVITE_MEMBERS: `${BASE_URL_API}/api/invite-members`,
-  REGISTER_INVITED_MEMBER: `${BASE_URL_API}/api/auth/register-invited-member`,
+  PERMISSION_LIST: `${BASE_URL_API}/api/roles/permissions/`,
+  ROLE : `${BASE_URL_API}/api/roles/`,
+  CREATE_TEAM_MEMBER: `${BASE_URL_API}/api/auth/create-team-member`,
+  DASHBOARD_SUMMARY: `${BASE_URL_API}/api/dashboard/summary`,
 };
 
 export const getAPIAUTHHEADERS = () => {

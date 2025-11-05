@@ -124,6 +124,7 @@ export const useVerifyEmail = () => {
       if (response?.success) {
         toast.success("Email verified successfully!");
         setToken(response?.token);
+        console.log('inside success of verify email')
         // Redirect to login or homepage after verification
         navigate("/team-setup");
       }

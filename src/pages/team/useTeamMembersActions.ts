@@ -3,6 +3,7 @@ import { APIENDPOINTS, getAPIAUTHHEADERS } from "@/constants/APIEndpoints";
 import { request } from "@/utils/request";
 import { toast } from "sonner";
 import { handleAPIResponse } from "@/utils/handleAPIResponse";
+import { useSessionStore } from "@/session/useSessionStore";
 
 
 export const useFetchTeamMembers = () => {
@@ -17,22 +18,42 @@ export const useFetchTeamMembers = () => {
     });
 };
 
-export const useSendInvitation = (onSuccessCallback?: () => void) => {
+export const useFetchMembersByTeam = (teamId?: string) => {
+  return useQuery({
+    queryKey: ["team-members", teamId],
+    enabled: !!teamId,
+    queryFn: () =>
+      request(`${APIENDPOINTS.TEAMSETUP}${teamId}/members`, {
+        method: "GET",
+        headers: getAPIAUTHHEADERS(),
+      }),
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useCreateTeamMember = (onSuccessCallback?: () => void) => {
+  const profile = useSessionStore((s) => s.profile);
+  const defaultTeamId = profile?.teams?.[0]?.teamId;
   return useMutation({
-    mutationFn: (data: any) =>
-      request(`${APIENDPOINTS.INVITE_MEMBERS}`, {
+    mutationFn: (data: { username: string; email: string; password: string; roleId: string; teamId?: string }) =>
+      request(`${APIENDPOINTS.CREATE_TEAM_MEMBER}`, {
         method: "POST",
         headers: getAPIAUTHHEADERS(),
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          username: data.username,
+          email: data.email,
+          password: data.password,
+          roleId: data.roleId,
+          teamId: data.teamId || defaultTeamId,
+        }),
       }),
 
     onSuccess: (response: any) => {
       const { status, message } = response;
       const result = handleAPIResponse(status, message);
-
       if (result.success) {
-        toast.success(result.message);
-        onSuccessCallback?.(); // Close modal if provided
+        toast.success(result.message || 'Member created');
+        onSuccessCallback?.();
       } else {
         toast.error(result.message);
       }

@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button';
 import ModalForm from '@/components/ui/ModalForm';
 import { useModal } from '@/hooks/useModal';
 import React from 'react';
-import { useFetchTeamMembers, useSendInvitation } from './useTeamMembersActions';
+import { useCreateTeamMember } from './useTeamMembersActions';
 import NoData from '@/components/elements/no-data/NoData';
-import { InviteTeamMemberFormFields } from './InviteTeamMemberFormFields';
+import { CreateTeamMemberFormFields } from './InviteTeamMemberFormFields';
 
 type Props = {
   // Define your props here
@@ -14,23 +14,25 @@ type Props = {
 const TeamMembers: React.FC<Props> = ({ }) => {
   // const { data } = useFetchTeamMembers();
   const { isOpen, openModal, closeModal, setIsOpen } = useModal();
-  const { mutate: sendInvitation, isPending } = useSendInvitation(closeModal);
+  const { mutate: createMember } = useCreateTeamMember(closeModal);
 
   const submitHandler = (e:React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData) as {
-      email:string;
-    }
-    console.log(data,'form data team');
-    sendInvitation(data)
+    const data = Object.fromEntries(formData) as unknown as {
+      username: string;
+      email: string;
+      password: string;
+      role?: 'member' | 'admin';
+    };
+    createMember(data);
   }
   // console.log(data,'here')
   return (
     <div>
       <Header text='Team Members' rightContent={
         <Button variant="default" size="sm" onClick={openModal}>
-          Invite a member
+          Add Team Member
         </Button>
       } />
       <NoData />
@@ -38,10 +40,10 @@ const TeamMembers: React.FC<Props> = ({ }) => {
       <ModalForm
         open={isOpen}
         onOpenChange={setIsOpen}
-        formTitle="Invite Team Member"
+        formTitle="Create Team Member"
         submitHandler={submitHandler}
       >
-        <InviteTeamMemberFormFields/>
+        <CreateTeamMemberFormFields/>
       </ModalForm>
     </div>
   );
