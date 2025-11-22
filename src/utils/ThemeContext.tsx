@@ -23,6 +23,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const body = document.body;
         html.classList.toggle('dark', isDark);
         body.classList.toggle('dark', isDark);
+        html.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        body.setAttribute('data-theme', isDark ? 'dark' : 'light');
         localStorage.setItem('theme', theme);
     }, [theme]);
 

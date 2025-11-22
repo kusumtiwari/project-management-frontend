@@ -10,6 +10,7 @@ export const APIENDPOINTS = {
   TASK: `${BASE_URL_API}/api/tasks/`,
   TEAMSETUP: `${BASE_URL_API}/api/teams/`,
   VERIFY_EMAIL: `${BASE_URL_API}/api/auth/verify-email`,
+  LOGOUT: `${BASE_URL_API}/api/auth/logout`,
   PERMISSION_LIST: `${BASE_URL_API}/api/roles/permissions/`,
   ROLE : `${BASE_URL_API}/api/roles/`,
   CREATE_TEAM_MEMBER: `${BASE_URL_API}/api/auth/create-team-member`,
@@ -18,10 +19,11 @@ export const APIENDPOINTS = {
 
 export const getAPIAUTHHEADERS = () => {
   const token = useSessionStore.getState().token; // Get fresh token each time
-  return {
+  const base: any = {
     Accept: "application/json",
     "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
   };
+  if (token) base.Authorization = `Bearer ${token}`;
+  return base;
 };
   

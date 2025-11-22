@@ -18,6 +18,33 @@ export const useFetchTeamMembers = () => {
     });
 };
 
+export const useCreateTeam = (onSuccessCallback?: () => void) => {
+  return useMutation({
+    mutationFn: (data: { name: string }) =>
+      request(`${APIENDPOINTS.TEAMSETUP}`, {
+        method: "POST",
+        headers: getAPIAUTHHEADERS(),
+        body: JSON.stringify({ name: data.name }),
+      }),
+
+    onSuccess: (response: any) => {
+      const status = response?.status;
+      const message = response?.data?.message;
+      const result = handleAPIResponse(status, message);
+      if (result.success) {
+        toast.success(result.message || "Team created");
+        onSuccessCallback?.();
+      } else {
+        toast.error(result.message);
+      }
+    },
+
+    onError: (error: any) => {
+      toast.error(error?.message || "Something went wrong");
+    },
+  });
+};
+
 export const useFetchMembersByTeam = (teamId?: string) => {
   return useQuery({
     queryKey: ["team-members", teamId],
@@ -49,7 +76,8 @@ export const useCreateTeamMember = (onSuccessCallback?: () => void) => {
       }),
 
     onSuccess: (response: any) => {
-      const { status, message } = response;
+      const status = response?.status;
+      const message = response?.data?.message;
       const result = handleAPIResponse(status, message);
       if (result.success) {
         toast.success(result.message || 'Member created');

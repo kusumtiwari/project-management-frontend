@@ -121,12 +121,13 @@ export const useVerifyEmail = () => {
       });
     },
     onSuccess: (response: any) => {
-      if (response?.success) {
+      console.log(response,'response')
+      if (response?.data?.success) {
         toast.success("Email verified successfully!");
         setToken(response?.token);
         console.log('inside success of verify email')
         // Redirect to login or homepage after verification
-        navigate("/team-setup");
+        navigate("/login");
       }
     },
     onError: (error: any) => {
