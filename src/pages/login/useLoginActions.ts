@@ -26,9 +26,7 @@ export const useLoginUser = () => {
     mutationFn: (data: LoginData) => {
       return request<LoginResponse>(APIENDPOINTS.LOGIN, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getAPIAUTHHEADERS(),
         body: JSON.stringify(data),
       });
         },
