@@ -12,8 +12,10 @@ export const APIENDPOINTS = {
   VERIFY_EMAIL: `${BASE_URL_API}/api/auth/verify-email`,
   LOGOUT: `${BASE_URL_API}/api/auth/logout`,
   PERMISSION_LIST: `${BASE_URL_API}/api/roles/permissions/`,
-  ROLE : `${BASE_URL_API}/api/roles/`,
+  ROLE: `${BASE_URL_API}/api/roles/`,
   CREATE_TEAM_MEMBER: `${BASE_URL_API}/api/auth/create-team-member`,
+  UPDATE_TEAM_MEMBER: `${BASE_URL_API}/api/teams/`, // + :teamId/members/:memberId
+  DELETE_TEAM_MEMBER: `${BASE_URL_API}/api/teams/`,
   DASHBOARD_SUMMARY: `${BASE_URL_API}/api/dashboard/summary`,
 };
 

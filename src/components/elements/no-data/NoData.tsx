@@ -1,14 +1,17 @@
-// NoData.tsx
-import Lottie from "lottie-react";
-import noDataAnimation from "../../../assets/animations.json"; // adjust the path
+// NoDataFound.tsx
+import { NoData } from "@/assets";
+import { cn } from "@/lib/utils"; // your classNames utility
 
-export default function NoData() {
+interface NoDataFoundProps {
+    desc?: string;
+    className?: string;
+}
+
+export default function NoDataFound({ desc = "No Data Found", className }: NoDataFoundProps) {
     return (
-        <div className="flex flex-col items-center justify-center py-10 bg-transparent">
-            <div className="w-60 h-60">
-                <Lottie animationData={noDataAnimation} loop autoplay />
-            </div>
-            <p className="text-gray-500 mt-4 text-center">No data found.</p>
+        <div className={cn("flex flex-col items-center justify-center w-full", className)}>
+            <NoData />
+            <p className="mt-4 text-center text-gray-500">{desc}</p>
         </div>
     );
 }

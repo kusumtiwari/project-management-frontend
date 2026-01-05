@@ -74,6 +74,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, onMove, onCardC
     setDraggingId(null);
   };
 
+  console.log(tasks,'tasks here')
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {(Object.keys(columns) as KanbanColumnKey[]).map((colKey) => (

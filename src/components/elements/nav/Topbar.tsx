@@ -33,10 +33,10 @@ const Topbar: React.FC = () => {
   };
 
   return (
-    <header className="shadow p-4 flex justify-between items-center bg-white dark:bg-neutral-900">
-      <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Dashboard</h1>
+    <header className="shadow p-4 flex justify-between items-cente">
+      <h1 className="text-lg font-semibold ">Dashboard</h1>
       <div className="flex items-center gap-4">
-        <span className="text-sm text-gray-700 dark:text-gray-200">
+        <span className="text-sm">
           Welcome, {profile?.username ?? 'User'}
         </span>
 
@@ -49,8 +49,8 @@ const Topbar: React.FC = () => {
         </div>
 
         <div className="relative" ref={menuRef}>
-          <button className="bg-gray-100 dark:bg-neutral-800 p-2 rounded-full" onClick={() => setOpen((v)=>!v)}>
-            <User className="w-5 h-5 text-gray-600 dark:text-gray-200" />
+          <button className=" p-2 rounded-full" onClick={() => setOpen((v)=>!v)}>
+            <User className="w-5 h-5 " />
           </button>
           {open && (
             <div className="absolute right-0 mt-2 w-56 rounded-md border bg-white shadow-lg dark:bg-neutral-900 dark:border-neutral-800">

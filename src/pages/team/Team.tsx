@@ -36,6 +36,7 @@ const TeamMembers: React.FC<Props> = ({ }) => {
       // refetch members implicitly via query key change by toggling state if needed
     }
   });
+  
   const { mutate: createTeam } = useCreateTeam(() => {
     closeTeamModal();
     refetchTeams();
@@ -66,23 +67,27 @@ const TeamMembers: React.FC<Props> = ({ }) => {
       <Header text='Team Members' rightContent={
         <div className='flex gap-2'>
           <Button variant="outline" size="sm" onClick={openTeamModal}>Create Team</Button>
-          <Button variant="default" size="sm" onClick={openModal}>Add Team Member</Button>
+          <Button variant="secondary" size="sm" onClick={openModal}>Add Team Member</Button>
         </div>
       } />
 
-      <div className='flex items-center gap-3'>
-        <span>Select Team</span>
-        <select
-          className='border rounded px-2 py-1'
-          value={selectedTeamId || ''}
-          onChange={(e) => setSelectedTeamId(e.target.value || undefined)}
-        >
-          {teams.map((t: any) => (
-            <option key={t._id} value={t._id}>{t.name}</option>
-          ))}
-        </select>
-        <span className='text-sm text-gray-600 dark:text-gray-300'>Members: {members.length}</span>
-      </div>
+      {
+        teams && teams?.length > 0 && 
+              <div className='flex items-center gap-3'>
+                <span>Select Team</span>
+                <select
+                  className='border rounded px-2 py-1'
+                  value={selectedTeamId || ''}
+                  onChange={(e) => setSelectedTeamId(e.target.value || undefined)}
+                >
+                  {teams.map((t: any) => (
+                    <option key={t._id} value={t._id}>{t.name}</option>
+                  ))}
+                </select>
+                <span className='text-sm text-gray-600 dark:text-gray-300'>Members: {members.length}</span>
+              </div>
+      }
+      
 
       {members.length === 0 ? (
         <NoData />
@@ -93,18 +98,17 @@ const TeamMembers: React.FC<Props> = ({ }) => {
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
-              <TableHead>Joined</TableHead>
+              <TableHead>Joined Date</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {members.map((m: any) => {
-              const teamInfo = (m.teams || []).find((t: any) => t.teamId === selectedTeamId);
               return (
                 <TableRow key={m._id}>
                   <TableCell>{m.username}</TableCell>
                   <TableCell>{m.email}</TableCell>
-                  <TableCell>{teamInfo?.role || 'member'}</TableCell>
-                  <TableCell>{teamInfo?.joinedAt ? new Date(teamInfo.joinedAt).toLocaleDateString() : '-'}</TableCell>
+                  <TableCell>{m.role || 'member'}</TableCell>
+                  <TableCell>{m.joinedAt ? new Date(m.joinedAt).toLocaleDateString() : '-'}</TableCell>
                 </TableRow>
               );
             })}

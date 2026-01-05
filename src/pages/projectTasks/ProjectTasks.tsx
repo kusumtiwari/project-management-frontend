@@ -5,7 +5,7 @@ import ModalForm from "@/components/ui/ModalForm";
 import { useModal } from "@/hooks/useModal";
 import { toast } from "sonner";
 import { AddTaskFormFields } from "./AddTaskFormFields";
-import { useFetchProjectTasks, useCreateTask, useUpdateTask } from "./useTaskActions";
+import { useFetchProjectTasks, useCreateTask, useUpdateTask, useFetchProjectMembers } from "./useTaskActions";
 import NoData from "@/components/elements/no-data/NoData";
 import {
   Table,
@@ -39,9 +39,10 @@ const ProjectTasks: React.FC = () => {
   const [view, setView] = useState<"table" | "board">("table");
   const [editing, setEditing] = useState<any | null>(null);
   const profile = useSessionStore((s:any) => s.profile);
-  const teamId = profile?.teams?.[0]?.teamId;
-  const membersQuery:any = useFetchMembersByTeam(teamId);
+  const membersQuery = useFetchProjectMembers(projectId);
+  const projectMembers = membersQuery?.data?.data || [];
 
+  console.log(projectMembers,'project members here')
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -122,7 +123,7 @@ const ProjectTasks: React.FC = () => {
                   <TableCell className="font-medium dark:text-gray-100">{task.title}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Badge
+                      {/* <Badge
                         variant={
                           task.status === "done"
                             ? "success"
@@ -132,7 +133,7 @@ const ProjectTasks: React.FC = () => {
                         }
                       >
                         {task.status}
-                      </Badge>
+                      </Badge> */}
                       <Select
                         defaultValue={task.status}
                         onValueChange={(value) =>
@@ -244,9 +245,9 @@ const ProjectTasks: React.FC = () => {
               <label htmlFor="assignedTo" className="text-sm font-medium">Assignee</label>
               <select id="assignedTo" name="assignedTo" defaultValue={editing.assignedTo?._id || ''} className="w-full border rounded px-3 py-2">
                 <option value="">Unassigned</option>
-                {membersQuery?.data?.data?.data?.map((m:any) => (
+                {/* {membersQuery?.data?.data?.map((m:any) => (
                   <option key={m._id} value={m._id}>{m.username} ({m.email})</option>
-                ))}
+                ))} */}
               </select>
             </div>
           </div>

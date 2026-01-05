@@ -38,7 +38,7 @@ const ModalForm: React.FC<ModalFormProps> = ({
                         <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                             Cancel
                         </Button>
-                        <Button type="submit">Submit</Button>
+                        <Button type="submit" variant='secondary'>Submit</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

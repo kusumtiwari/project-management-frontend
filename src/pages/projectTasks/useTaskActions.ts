@@ -82,3 +82,11 @@ export const useDeleteTask = () => {
     },
   });
 };
+
+export const useFetchProjectMembers = (projectId?: string) => {
+  return useQuery({
+    queryKey: ["project-members", projectId],
+    queryFn: () => request(`${APIENDPOINTS.TEAMSETUP}${projectId}/members`, { method: "GET", headers: getAPIAUTHHEADERS() }),
+    enabled: !!projectId,
+  });
+};

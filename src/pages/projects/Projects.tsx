@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NoData from "../../components/elements/no-data/NoData";
 import { useFetchProjectList, useCreateProject } from "./useProjectActions";
@@ -9,6 +9,12 @@ import ModalForm from "@/components/ui/ModalForm";
 import { AddProjectFormFields } from "./AddProjectFormFields";
 import { useModal } from "@/hooks/useModal";
 import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import {
   Table,
@@ -20,39 +26,55 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Edit, Trash2, MoreVertical } from "lucide-react";
+import { useFetchTeamMembers } from "../team/useTeamMembersActions";
 
 const Projects: React.FC = () => {
   useFetchProjectList();
   const projectList = useProjectStore((state) => state.projectList);
   const { mutate: createProject } = useCreateProject();
+  // const [teams, setTeams] = useState([]);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState("");
   const { isOpen, openModal, closeModal, setIsOpen } = useModal();
   const navigate = useNavigate();
+
+  const { data: teamsResp, refetch: refetchTeams } = useFetchTeamMembers();
+  const teams = useMemo(() => (teamsResp as any)?.data?.data || [], [teamsResp]);
+
+  console.log(teams,'teams here')
 
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData) as {
-      name: string;
-      description?: string;
-      deadline?: string;
+
+    // Parse teamMembers from JSON string
+    const teamMembersStr = formData.get("teamMembers") as string;
+    const teamMembers = teamMembersStr ? JSON.parse(teamMembersStr) : [];
+
+    const payload = {
+      name: formData.get("name") as string,
+      description: formData.get("description") as string,
+      teamId: formData.get("teamId") as string,
+      teamMembers: teamMembers, // Array of member IDs
+      status: formData.get("status") as string,
+      deadline: formData.get("deadline") as string,
     };
 
-    const newProject = {
-      ...data,
-      status: "Not Started" as const,
-      deadline: data.deadline ? new Date(data.deadline) : undefined,
-    };
+    console.log('Creating project with payload:', payload);
 
-    createProject(newProject, {
+    createProject(payload, {
       onSuccess: (response: any) => {
         if (response?.data?.success) {
           toast.success('Project created successfully');
           closeModal();
         } else {
-          toast.error(response?.data?.message);
+          toast.error(response?.data?.message || 'Failed to create project');
         }
       },
+      onError: (error: any) => {
+        toast.error(error?.message || 'An error occurred');
+      }
     });
   };
 
@@ -73,9 +95,9 @@ const Projects: React.FC = () => {
 
       {/* Project Table Section */}
       {projectList?.length === 0 ? (
-        <NoData />
+        <NoData desc="No Projects Found!"/>
       ) : (
-        <div className="mt-4 rounded-2xl border bg-white shadow-sm">
+        <div className="mt-4 rounded-2xl border shadow-sm">
           <Table>
             <TableHeader>
               <TableRow>
@@ -116,56 +138,15 @@ const Projects: React.FC = () => {
                   <TableCell className="max-w-[250px] truncate">
                     {project.description || "No description"}
                   </TableCell>
-
-                  {/* ✅ Action Buttons */}
-                  <TableCell className="text-right space-x-2">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleView(project._id)}
-                          >
-                            <Eye className="w-4 h-4 text-blue-600" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>View Tasks</p>
-                        </TooltipContent>
-                      </Tooltip>
-
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(project._id)}
-                          >
-                            <Edit className="w-4 h-4 text-green-600" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Edit Project</p>
-                        </TooltipContent>
-                      </Tooltip>
-
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(project._id)}
-                          >
-                            <Trash2 className="w-4 h-4 text-red-600" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Delete Project</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                  <TableCell className="text-right">
+                    <ProjectActions
+                      projectId={project._id}
+                      onView={handleView}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                    />
                   </TableCell>
+
                 </TableRow>
               ))}
             </TableBody>
@@ -187,3 +168,47 @@ const Projects: React.FC = () => {
 };
 
 export default Projects;
+
+interface ProjectActionsProps {
+  projectId: string;
+  onView: (id: string) => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+}
+
+const ProjectActions: React.FC<ProjectActionsProps> = ({
+  projectId,
+  onView,
+  onEdit,
+  onDelete,
+}) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="w-40">
+        <DropdownMenuItem onClick={() => onView(projectId)}>
+          <Eye className="mr-2 h-4 w-4" />
+          View
+        </DropdownMenuItem>
+
+        <DropdownMenuItem onClick={() => onEdit(projectId)}>
+          <Edit className="mr-2 h-4 w-4" />
+          Edit
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          className="text-red-600 focus:text-red-600"
+          onClick={() => onDelete(projectId)}
+        >
+          <Trash2 className="mr-2 h-4 w-4" />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};

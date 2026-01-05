@@ -36,6 +36,8 @@ function Badge({
   VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
   const Comp = asChild ? Slot : "span"
 
+  console.log(variant,'badge variant')
+
   return (
     <Comp
       data-slot="badge"

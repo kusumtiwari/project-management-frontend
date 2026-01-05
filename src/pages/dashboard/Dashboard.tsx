@@ -1,50 +1,15 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '../../components/ui/card';
-import {  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { NoData } from '@/assets';
 import { ChevronDown, ChevronUp, Users, CheckCircle, Clock, TrendingUp, Calendar, Target, Zap } from 'lucide-react';
 import { useDashboardActions } from './useDashboardActions';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import getStatusBadge from '@/utils/getStatusBadge';
+import NoDataFound from '@/components/elements/no-data/NoData';
 
 dayjs.extend(relativeTime);
 
-const tasksOverTime = [
-  { name: 'Jan', tasks: 40, completed: 35, inProgress: 5 },
-  { name: 'Feb', tasks: 30, completed: 28, inProgress: 2 },
-  { name: 'Mar', tasks: 20, completed: 15, inProgress: 5 },
-  { name: 'Apr', tasks: 27, completed: 20, inProgress: 7 },
-  { name: 'May', tasks: 18, completed: 16, inProgress: 2 },
-  { name: 'Jun', tasks: 23, completed: 18, inProgress: 5 },
-];
-
-const projectData = [
-  { name: 'Website Redesign', progress: 85, tasks: 24, completed: 20, team: 5, priority: 'high' },
-  { name: 'Mobile App', progress: 62, tasks: 18, completed: 11, team: 4, priority: 'medium' },
-  { name: 'API Integration', progress: 90, tasks: 12, completed: 11, team: 3, priority: 'high' },
-  { name: 'Marketing Campaign', progress: 45, tasks: 15, completed: 7, team: 6, priority: 'low' },
-];
-
-const taskDistribution = [
-  { name: 'Completed', value: 156, color: '#10b981' },
-  { name: 'In Progress', value: 28, color: '#f59e0b' },
-  { name: 'Pending', value: 12, color: '#ef4444' },
-  { name: 'Review', value: 8, color: '#8b5cf6' },
-];
-
-const teamPerformance = [
-  { name: 'Design', efficiency: 92, tasks: 45 },
-  { name: 'Development', efficiency: 88, tasks: 67 },
-  { name: 'QA', efficiency: 95, tasks: 23 },
-  { name: 'Marketing', efficiency: 78, tasks: 34 },
-];
-
-const recentActivity = [
-  { user: 'Sarah Chen', action: 'completed task', item: 'UI Design Review', time: '2 min ago', avatar: '👩‍💻' },
-  { user: 'Mike Johnson', action: 'created project', item: 'E-commerce Platform', time: '15 min ago', avatar: '👨‍💼' },
-  { user: 'Emma Davis', action: 'updated milestone', item: 'Beta Release', time: '1 hour ago', avatar: '👩‍🎨' },
-  { user: 'Alex Kumar', action: 'resolved bug', item: 'Login Authentication', time: '2 hours ago', avatar: '👨‍💻' },
-];
 
 const Dashboard: React.FC = () => {
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({
@@ -58,15 +23,6 @@ const Dashboard: React.FC = () => {
       ...prev,
       [section]: !prev[section]
     }));
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
   };
 
   const { data, isLoading } = useDashboardActions();
@@ -110,10 +66,10 @@ if (!dashboard) {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-green-100 text-sm font-medium">Completed Tasks</p>
-                    <p className="text-3xl font-bold">156</p>
+                    <p className="text-3xl font-bold"> {dashboard?.completedTasks ?? 0}</p>
                     <p className="text-green-100 text-sm flex items-center mt-2">
                       <CheckCircle className="w-4 h-4 mr-1" />
-                     {dashboard?.completedTasks}
+                    
                     </p>
                   </div>
                   <div className="bg-white/20 p-3 rounded-full">
@@ -162,7 +118,7 @@ if (!dashboard) {
 
         
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-bold text-xl text-gray-800 flex items-center">
+                <h2 className="font-bold text-xl flex items-center">
                   <Calendar className="w-5 h-5 mr-2 text-orange-600" />
                   Recent Activity
                 </h2>
@@ -182,7 +138,8 @@ if (!dashboard) {
               {expandedSections.activity && (
                 <div className="flex flex-wrap gap-4">
                   {dashboard.recentActivity.length === 0 && (
-                    <p className="text-sm text-gray-500">No recent activity</p>
+                   <NoDataFound desc='No recent Activity!'/>
+                
                   )}
 
                   {dashboard.recentActivity.map((activity) => (
