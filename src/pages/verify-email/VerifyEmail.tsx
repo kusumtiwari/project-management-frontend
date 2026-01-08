@@ -1,21 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useVerifyEmail } from "../login/useLoginActions";
-import { Loader2 } from "lucide-react"; // spinner icon from shadcn
+import { Loader2 } from "lucide-react";
 
 function VerifyEmail() {
     const [searchParams] = useSearchParams();
-    const [message, setMessage] = useState("Verifying...");
     const token = searchParams.get("token");
-    const verifyEmailMutation = useVerifyEmail();
+
+    const { mutate, isPending, isError, isSuccess } = useVerifyEmail();
 
     useEffect(() => {
-        if (token) {
-            verifyEmailMutation.mutate(token);
-        }
+        if (token) mutate(token);
     }, [token]);
 
-    if (verifyEmailMutation.isPending) {
+    if (isPending) {
         return (
             <div className="flex flex-col items-center justify-center h-screen">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -24,7 +22,7 @@ function VerifyEmail() {
         );
     }
 
-    if (verifyEmailMutation.isError) {
+    if (isError) {
         return (
             <div className="flex flex-col items-center justify-center h-screen">
                 <p className="text-destructive">Verification failed.</p>
@@ -32,7 +30,7 @@ function VerifyEmail() {
         );
     }
 
-    if (verifyEmailMutation.isSuccess) {
+    if (isSuccess) {
         return (
             <div className="flex flex-col items-center justify-center h-screen">
                 <p className="text-green-600">Email verified! Redirecting...</p>
@@ -40,12 +38,7 @@ function VerifyEmail() {
         );
     }
 
-    return (
-        <div className="flex flex-col items-center justify-center h-screen">
-            <h1 className="text-xl font-semibold">Email Verification</h1>
-            <p className="text-muted-foreground">{message}</p>
-        </div>
-    );
+    return null; // Nothing before mutate runs
 }
 
 export default VerifyEmail;

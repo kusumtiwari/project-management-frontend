@@ -28,8 +28,8 @@ const navigationItems: NavigationItem[] = [
     icon: Users,
   },
   {
-    title: "Tasks",
-    route: "/tasks",
+    title: "Roles",
+    route: "/roles",
     icon: CheckSquare,
   },
 ];

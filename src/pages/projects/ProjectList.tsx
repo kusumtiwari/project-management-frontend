@@ -23,24 +23,25 @@ const statusColorMap: Record<Project["status"], string> = {
 };
 
 const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
+    console.log(projects,'projects')
     if (projects.length === 0) return null;
 
     return (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-            {projects.map((project) => (
+            {projects?.map((project) => (
                 <Card key={project._id} className="shadow-md bg-primary-500 text-white cursor-pointer hover:scale-105 transition transform duration-300 ease-in-out">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-lg font-semibold">{project.name}</CardTitle>
-                        <Badge className={statusColorMap[project.status]}>
-                            {project.status}
+                        <CardTitle className="text-lg font-semibold">{project?.name}</CardTitle>
+                        <Badge className={statusColorMap[project?.status]}>
+                            {project?.status}
                         </Badge>
                     </CardHeader>
                     <CardContent className="text-sm text-white space-y-2">
-                        {project.description && <p>{project.description}</p>}
-                        {project.deadline && (
+                        {project?.description && <p>{project?.description}</p>}
+                        {project?.deadline && (
                             <p>
                                 <span className="font-medium text-white">Deadline: </span>
-                                {dayjs(project.deadline).format("MMMM D, YYYY")}
+                                {dayjs(project?.deadline).format("MMMM D, YYYY")}
                             </p>
                         )}
                     </CardContent>

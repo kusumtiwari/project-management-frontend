@@ -37,7 +37,10 @@ export async function request<T>(
   options?: RequestInit
 ): Promise<{ status: number; data: T }> {
   try {
-    const response = await fetch(url, options);
+    const response = await fetch(url, {
+      ...options,
+      credentials: options?.credentials ?? 'include',
+    });
 
     await checkStatus(response); // Will throw if !response.ok
 

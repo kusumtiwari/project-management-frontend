@@ -1,20 +1,27 @@
-import React from 'react';
-import { Outlet, Routes, Route } from 'react-router-dom';
-import Projects from '../pages/projects/Projects';
-import ProjectDetails from '../pages/projects/ProjectDetails';
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Projects from "../pages/projects/Projects";
+import ProjectDetails from "../pages/projects/ProjectDetails";
+import ProjectTasks from "@/pages/projectTasks/ProjectTasks";
+import { useSessionStore } from "@/session/useSessionStore";
 
-type Props = {
-    // you can define any props if needed, otherwise keep empty
-}
+const ProjectRoutes: React.FC = () => {
+    const profile = useSessionStore((s: any) => s.profile);
+    const getPermissions = useSessionStore((s: any) => s.getPermissions);
 
-const ProjectRoutes: React.FC<Props> = () => {
+    // Check if user has permission to view projects
+    const canViewProjects = profile?.isAdmin || getPermissions().includes('view_project');
+
     return (
         <Routes>
-            {/* Parent route for projects */}
-                <Route index element={<Projects />} />
-                <Route path=":projectId" element={<ProjectDetails />} />
-                {/* Add more nested project-related routes here if needed */}
-         
+            {/* /projects */}
+            <Route index element={canViewProjects ? <Projects /> : <Navigate to="/" replace />} />
+
+            {/* /projects/:id */}
+            <Route path=":id" element={canViewProjects ? <ProjectDetails /> : <Navigate to="/" replace />} />
+
+            {/* /project/task/:id */}
+            <Route path="/tasks/:id" element={canViewProjects ? <ProjectTasks /> : <Navigate to="/" replace />} />
         </Routes>
     );
 };

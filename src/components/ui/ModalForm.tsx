@@ -26,19 +26,19 @@ const ModalForm: React.FC<ModalFormProps> = ({
 }) => {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md bg-white rounded-xl p-6">
-                <form onSubmit={submitHandler}>
+            <DialogContent className="sm:max-w-md bg-white rounded-xl p-6 max-h-[85vh] flex flex-col overflow-hidden">
+                <form onSubmit={submitHandler} className="flex flex-col overflow-hidden h-full">
                     <DialogHeader>
                         <DialogTitle>{formTitle}</DialogTitle>
                     </DialogHeader>
 
-                    <div className="mt-4">{children}</div>
+                    <div className="mt-4 overflow-y-auto flex-1 pr-4">{children}</div>
 
-                    <DialogFooter className="mt-6 flex gap-2 justify-end">
+                    <DialogFooter className="mt-6 flex gap-2 justify-end flex-shrink-0">
                         <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                             Cancel
                         </Button>
-                        <Button type="submit">Submit</Button>
+                        <Button type="submit" variant='secondary'>Submit</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

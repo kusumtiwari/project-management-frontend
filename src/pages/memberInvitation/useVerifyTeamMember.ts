@@ -4,6 +4,7 @@ import { request } from "../../utils/request";
 import { APIENDPOINTS, getAPIAUTHHEADERS } from "../../constants/APIEndpoints";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { handleAPIResponse } from "@/utils/handleAPIResponse";
 
 export const useVerifyTeamMember = () => {
     const navigate = useNavigate();
@@ -13,18 +14,6 @@ export const useVerifyTeamMember = () => {
             return request(`${APIENDPOINTS.VERITY_TEAM_MEMBER}?token=${token}`, {
                 method: "GET",
             });
-        },
-        onSuccess: (response: any) => {
-            if (response?.success) {
-                toast.success("Email verified successfully");
-                // setToken(response?.token);
-                // Redirect to login or homepage after verification
-                // navigate("/team-setup");
-            }
-        },
-        onError: (error: any) => {
-            toast.error("Verification failed. Please try again");
-            console.error("Verify email error:", error);
         },
     });
 };
