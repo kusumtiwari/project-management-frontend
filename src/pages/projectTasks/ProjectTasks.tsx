@@ -188,7 +188,7 @@ const ProjectTasks: React.FC = () => {
         formTitle="Add New Task"
         submitHandler={submitHandler}
       >
-        <AddTaskFormFields />
+        <AddTaskFormFields projectId={projectId} />
       </ModalForm>
 
       {/* Edit Task Modal */}

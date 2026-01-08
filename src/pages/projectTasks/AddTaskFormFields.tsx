@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -9,8 +9,19 @@ import {
     SelectItem,
     SelectValue,
 } from "@/components/ui/select";
+import { useFetchProjectMembers } from "./useTaskActions";
 
-export const AddTaskFormFields: React.FC = () => {
+interface AddTaskFormFieldsProps {
+    projectId?: string;
+}
+
+export const AddTaskFormFields: React.FC<AddTaskFormFieldsProps> = ({ projectId }) => {
+    const [selectedMember, setSelectedMember] = useState<string>("");
+    
+    // Fetch project members
+    const { data: membersResp } = useFetchProjectMembers(projectId || "");
+    const members = useMemo(() => (membersResp as any)?.data || [], [membersResp]);
+
     return (
         <div className="space-y-6">
             {/* Title */}
@@ -32,7 +43,7 @@ export const AddTaskFormFields: React.FC = () => {
                     <SelectTrigger id="status" className="w-full">
                         <SelectValue placeholder="Select status" />
                     </SelectTrigger>
-                    <SelectContent className="bg-white">
+                    <SelectContent className="z-50 bg-white">
                         <SelectItem value="backlog">Backlog</SelectItem>
                         <SelectItem value="in-progress">In Progress</SelectItem>
                         <SelectItem value="review">Review</SelectItem>
@@ -41,6 +52,26 @@ export const AddTaskFormFields: React.FC = () => {
                     </SelectContent>
                 </Select>
             </div>
+
+            {/* Assigned To */}
+            {projectId && members.length > 0 && (
+                <div className="space-y-2">
+                    <Label htmlFor="assignedTo">Assign To (Optional)</Label>
+                    <Select name="assignedTo" value={selectedMember} onValueChange={setSelectedMember}>
+                        <SelectTrigger id="assignedTo" className="w-full">
+                            <SelectValue placeholder="Select a team member" />
+                        </SelectTrigger>
+                        <SelectContent className="z-50 bg-white">
+                            <SelectItem value="">Unassigned</SelectItem>
+                            {members.map((member: any) => (
+                                <SelectItem key={member._id} value={member._id}>
+                                    {member.username} ({member.email})
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            )}
 
             {/* Deadline */}
             <div className="space-y-2">

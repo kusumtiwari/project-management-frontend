@@ -103,6 +103,7 @@ const Projects: React.FC = () => {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Assigned Members</TableHead>
                 <TableHead>Deadline</TableHead>
                 <TableHead>Created At</TableHead>
                 <TableHead>Description</TableHead>
@@ -126,6 +127,29 @@ const Projects: React.FC = () => {
                     >
                       {project.status}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {project.teamMembers && project.teamMembers.length > 0 ? (
+                        project.teamMembers.slice(0, 2).map((member: any) => (
+                          <Tooltip key={member.userId?._id || member._id}>
+                            <TooltipTrigger asChild>
+                              <div className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
+                                {member.userId?.username || member.username}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>{member.userId?.email || member.email}</TooltipContent>
+                          </Tooltip>
+                        ))
+                      ) : (
+                        <span className="text-gray-500 text-sm">—</span>
+                      )}
+                      {project.teamMembers && project.teamMembers.length > 2 && (
+                        <div className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs font-medium">
+                          +{project.teamMembers.length - 2}
+                        </div>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     {project.deadline

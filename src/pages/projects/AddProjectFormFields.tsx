@@ -75,18 +75,19 @@ export const AddProjectFormFields = () => {
                 />
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 bg-white z-50 ">
                 <Label htmlFor="teamId">Select Team *</Label>
                 <Select
                     name="teamId"
                     value={selectedTeamId}
                     onValueChange={handleTeamChange}
                     required
+            
                 >
                     <SelectTrigger>
                         <SelectValue placeholder="Choose a team" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[9999]">
                         {teams.map((team: any) => (
                             <SelectItem key={team._id} value={team._id}>
                                 {team.name}
@@ -97,7 +98,7 @@ export const AddProjectFormFields = () => {
             </div>
 
             {selectedTeamId && members.length > 0 && (
-                <div className="space-y-3">
+                <div className="space-y-3 relative z-40">
                     <div className="flex items-center justify-between">
                         <Label>Assign Members (Optional)</Label>
                         <button
@@ -110,7 +111,7 @@ export const AddProjectFormFields = () => {
                                 : "Select All"}
                         </button>
                     </div>
-                    <div className="border rounded-md p-3 max-h-60 overflow-y-auto space-y-2">
+                    <div className="border rounded-md p-3 max-h-48 overflow-y-auto space-y-2 bg-white">
                         {members.map((member: any) => (
                             <div key={member._id} className="flex items-center space-x-2">
                                 <Checkbox
@@ -142,13 +143,13 @@ export const AddProjectFormFields = () => {
                 </div>
             )}
 
-            <div className="space-y-3">
+            <div className="space-y-3 relative z-40">
                 <Label htmlFor="status">Status</Label>
                 <Select name="status" defaultValue="Not Started">
                     <SelectTrigger>
                         <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[9999]">
                         <SelectItem value="Not Started">Not Started</SelectItem>
                         <SelectItem value="In Progress">In Progress</SelectItem>
                         <SelectItem value="Completed">Completed</SelectItem>
