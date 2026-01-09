@@ -5,6 +5,9 @@ interface UserProfile {
   username: string;
   email: string;
   isAdmin?: boolean;
+  isSuperAdmin?: boolean;
+  userType?: 'superadmin' | 'admin' | 'member';
+  hasCompletedSetup?: boolean;
   teams?: Array<{
     teamId: string;
     teamName: string;

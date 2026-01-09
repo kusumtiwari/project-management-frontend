@@ -4,6 +4,7 @@ import useTaskStore from "./useTaskStore";
 import { request } from "@/utils/request";
 import { APIENDPOINTS, getAPIAUTHHEADERS } from "@/constants/APIEndpoints";
 import { useEffect } from "react";
+import type { APIResponse, ProjectMembersResponse, Task } from "@/types/project";
 
 export const useFetchProjectTasks = (projectId?: string, status?: string) => {
   const setTaskList = useTaskStore((state:any) => state.setTaskList);
@@ -84,9 +85,13 @@ export const useDeleteTask = () => {
 };
 
 export const useFetchProjectMembers = (projectId?: string) => {
-  return useQuery({
+  return useQuery<APIResponse<ProjectMembersResponse>>({
     queryKey: ["project-members", projectId],
-    queryFn: () => request(`${APIENDPOINTS.TASK}${projectId}/members`, { method: "GET", headers: getAPIAUTHHEADERS() }),
+    queryFn: () => request<ProjectMembersResponse>(`${APIENDPOINTS.PROJECTS}${projectId}/members`, { 
+      method: "GET", 
+      headers: getAPIAUTHHEADERS() 
+    }),
     enabled: !!projectId,
+    refetchOnWindowFocus: false,
   });
 };

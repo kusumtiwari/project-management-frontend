@@ -17,6 +17,15 @@ export const APIENDPOINTS = {
   UPDATE_TEAM_MEMBER: `${BASE_URL_API}/api/teams/`, // + :teamId/members/:memberId
   DELETE_TEAM_MEMBER: `${BASE_URL_API}/api/teams/`,
   DASHBOARD_SUMMARY: `${BASE_URL_API}/api/dashboard/summary`,
+  // SuperAdmin endpoints
+  SUPERADMIN: {
+    CREATE_ADMIN: `${BASE_URL_API}/api/superadmin/create-admin`,
+    GET_ADMINS: `${BASE_URL_API}/api/superadmin/admins`,
+    GET_USERS: `${BASE_URL_API}/api/superadmin/users`,
+    DELETE_ADMIN: `${BASE_URL_API}/api/superadmin/admin/`, // + :adminId
+    UPDATE_ADMIN_STATUS: `${BASE_URL_API}/api/superadmin/admin/`, // + :adminId/status
+    SYSTEM_STATS: `${BASE_URL_API}/api/superadmin/stats`,
+  },
 };
 
 export const getAPIAUTHHEADERS = () => {
