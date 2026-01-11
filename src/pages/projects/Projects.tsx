@@ -33,9 +33,7 @@ const Projects: React.FC = () => {
   useFetchProjectList();
   const projectList = useProjectStore((state) => state.projectList);
   const { mutate: createProject } = useCreateProject();
-  // const [teams, setTeams] = useState([]);
-  const [teamMembers, setTeamMembers] = useState([]);
-  const [selectedTeam, setSelectedTeam] = useState("");
+
   const { isOpen, openModal, closeModal, setIsOpen } = useModal();
   const navigate = useNavigate();
 
@@ -44,39 +42,45 @@ const Projects: React.FC = () => {
 
   console.log(teams,'teams here')
 
-  const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+ const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  const formData = new FormData(e.currentTarget);
 
-    // Parse teamMembers from JSON string
+  try {
+    const teamsStr = formData.get("teams") as string;
     const teamMembersStr = formData.get("teamMembers") as string;
-    const teamMembers = teamMembersStr ? JSON.parse(teamMembersStr) : [];
 
     const payload = {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
-      teamId: formData.get("teamId") as string,
-      teamMembers: teamMembers, // Array of member IDs
+      teams: teamsStr ? JSON.parse(teamsStr) : [], // array of team IDs
+      // teamMembers: teamMembersStr ? JSON.parse(teamMembersStr) : [], // [{ userId, teamId, role }]
       status: formData.get("status") as string,
+      priority: formData.get("priority") as string,
       deadline: formData.get("deadline") as string,
     };
 
-    console.log('Creating project with payload:', payload);
+    console.log("Creating project with payload:", payload);
 
     createProject(payload, {
       onSuccess: (response: any) => {
         if (response?.data?.success) {
-          toast.success('Project created successfully');
+          toast.success("Project created successfully");
           closeModal();
         } else {
-          toast.error(response?.data?.message || 'Failed to create project');
+          toast.error(response?.data?.message || "Failed to create project");
         }
       },
       onError: (error: any) => {
-        toast.error(error?.message || 'An error occurred');
-      }
+        toast.error(error?.message || "An error occurred");
+      },
     });
-  };
+  } catch (err) {
+    console.error("Error parsing form data:", err);
+    toast.error("Invalid form data");
+  }
+};
+
 
   const handleView = (id: string) => navigate(`/projects/tasks/${id}`);
   const handleEdit = (id: string) => console.log("Edit project", id);
@@ -103,7 +107,8 @@ const Projects: React.FC = () => {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Assigned Members</TableHead>
+                <TableHead>Teams</TableHead>
+
                 <TableHead>Deadline</TableHead>
                 <TableHead>Created At</TableHead>
                 <TableHead>Description</TableHead>
@@ -128,29 +133,20 @@ const Projects: React.FC = () => {
                       {project.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {project.teamMembers && project.teamMembers.length > 0 ? (
-                        project.teamMembers.slice(0, 2).map((member: any) => (
-                          <Tooltip key={member.userId?._id || member._id}>
-                            <TooltipTrigger asChild>
-                              <div className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
-                                {member.userId?.username || member.username}
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent>{member.userId?.email || member.email}</TooltipContent>
-                          </Tooltip>
-                        ))
-                      ) : (
-                        <span className="text-gray-500 text-sm">—</span>
-                      )}
-                      {project.teamMembers && project.teamMembers.length > 2 && (
-                        <div className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs font-medium">
-                          +{project.teamMembers.length - 2}
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
+                 <TableCell>
+  <div className="flex flex-wrap gap-1">
+    {project.teams && project.teams.length > 0 ? (
+      project.teams.map((team: any) => (
+        <Badge key={team._id} variant="outline">
+          {team.name}
+        </Badge> 
+      ))
+    ) : (
+      <span className="text-gray-500 text-sm">—</span>
+    )}
+  </div>
+</TableCell>
+
                   <TableCell>
                     {project.deadline
                       ? new Date(project.deadline).toLocaleDateString()

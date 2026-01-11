@@ -1,191 +1,167 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
-    Select,
-    SelectTrigger,
-    SelectContent,
-    SelectItem,
-    SelectValue,
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
 } from "@/components/ui/select";
 import { useFetchProjectMembers } from "./useTaskActions";
+import { useFetchMembersByTeam } from "../team/useTeamMembersActions";
+import { useSessionStore } from "@/session/useSessionStore";
 
 interface AddTaskFormFieldsProps {
-    projectId?: string;
+  projectId?: string;
 }
 
-interface ProjectMember {
-    _id: string;
-    username: string;
-    email: string;
-    role?: string;
+interface Team {
+  _id: string;
+  name: string;
 }
 
-export const AddTaskFormFields: React.FC<AddTaskFormFieldsProps> = ({ projectId }) => {
-    const [selectedMember, setSelectedMember] = useState<string>("");
-    
-    // Fetch project members
-    const { data: membersResp, isLoading: membersLoading, error: membersError } = useFetchProjectMembers(projectId || "");
-    
-    // Extract members with proper typing and error handling
-    const members: ProjectMember[] = useMemo(() => {
-        try {
-            console.log('Members response:', membersResp);
-            
-            if (!membersResp?.data?.data?.members) {
-                console.log('No members found in response structure');
-                return [];
-            }
-            
-            const membersList = membersResp.data.data.members;
-            console.log('Extracted members list:', membersList);
-            
-            return Array.isArray(membersList) ? membersList : [];
-        } catch (error) {
-            console.error('Error extracting members:', error);
-            return [];
-        }
-    }, [membersResp]);
+interface TeamMember {
+  _id: string;
+  username: string;
+  email: string;
+  role?: string;
+}
 
-    console.log('Available members for task assignment:', members);
+export const AddTaskFormFields: React.FC<AddTaskFormFieldsProps> = ({
+  projectId,
+}) => {
+  const profile = useSessionStore((s: any) => s.profile);
 
-    return (
-        <div className="space-y-6">
-            {/* Title */}
-            <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
-                <Input 
-                    id="title" 
-                    name="title" 
-                    placeholder="Enter task title" 
-                    required 
-                />
-            </div>
+  // --- Step 1: fetch project teams & members ---
+  const {
+    data: projectResp,
+    isLoading: projectLoading,
+    error: projectError,
+  } = useFetchProjectMembers(projectId || "");
 
-            {/* Description */}
-            <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea 
-                    id="description" 
-                    name="description" 
-                    placeholder="Enter task description" 
-                    rows={4} 
-                />
-            </div>
+  const projectTeams: Team[] = useMemo(() => {
+    return projectResp?.data?.data?.teams || [];
+  }, [projectResp]);
 
-            {/* Status and Priority Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Status */}
-                <div className="space-y-2">
-                    <Label htmlFor="status">Status</Label>
-                    <Select name="status" defaultValue="backlog">
-                        <SelectTrigger id="status" className="w-full">
-                            <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent className="z-50 bg-white">
-                            <SelectItem value="backlog">Backlog</SelectItem>
-                            <SelectItem value="in-progress">In Progress</SelectItem>
-                            <SelectItem value="review">Review</SelectItem>
-                            <SelectItem value="done">Done</SelectItem>
-                            <SelectItem value="deployed">Deployed</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
+  // --- Step 2: selected team ---
+  const [selectedTeam, setSelectedTeam] = useState<string>(
+    projectTeams?.[0]?._id || ""
+  );
 
-                {/* Priority */}
-                <div className="space-y-2">
-                    <Label htmlFor="priority">Priority</Label>
-                    <Select name="priority" defaultValue="medium">
-                        <SelectTrigger id="priority" className="w-full">
-                            <SelectValue placeholder="Select priority" />
-                        </SelectTrigger>
-                        <SelectContent className="z-50 bg-white">
-                            <SelectItem value="low">🟢 Low</SelectItem>
-                            <SelectItem value="medium">🟡 Medium</SelectItem>
-                            <SelectItem value="high">🟠 High</SelectItem>
-                            <SelectItem value="urgent">🔴 Urgent</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
+  useEffect(() => {
+    if (projectTeams.length > 0 && !selectedTeam) {
+      setSelectedTeam(projectTeams[0]._id);
+    }
+  }, [projectTeams]);
 
-            {/* Assigned To */}
-            <div className="space-y-2">
-                <Label htmlFor="assignedTo">Assign To (Optional)</Label>
-                {membersLoading ? (
-                    <div className="text-sm text-gray-500 p-3 border rounded">
-                        Loading project members...
-                    </div>
-                ) : membersError ? (
-                    <div className="text-sm text-red-500 p-3 border rounded border-red-200 bg-red-50">
-                        Error loading members. Please try again.
-                    </div>
-                ) : (
-                    <>
-                        <Select name="assignedTo" value={selectedMember} onValueChange={setSelectedMember}>
-                            <SelectTrigger id="assignedTo" className="w-full">
-                                <SelectValue placeholder={
-                                    members.length > 0 
-                                        ? "Select a team member" 
-                                        : "No members available"
-                                } />
-                            </SelectTrigger>
-                            <SelectContent className="z-50 bg-white max-h-60 overflow-y-auto">
-                                <SelectItem value="">Unassigned</SelectItem>
-                                {members.map((member) => (
-                                    <SelectItem key={member._id} value={member._id}>
-                                        <div className="flex flex-col">
-                                            <span className="font-medium">{member.username}</span>
-                                            <span className="text-xs text-gray-500">{member.email}</span>
-                                            {member.role && (
-                                                <span className="text-xs text-blue-600">({member.role})</span>
-                                            )}
-                                        </div>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        
-                        {projectId && members.length === 0 && !membersLoading && (
-                            <div className="text-sm text-amber-600 p-3 border rounded border-amber-200 bg-amber-50">
-                                ⚠️ No team members assigned to this project yet. 
-                                Ask an admin to assign members to the project first.
-                            </div>
-                        )}
-                        
-                        {!projectId && (
-                            <div className="text-sm text-gray-500">
-                                Project ID not available.
-                            </div>
-                        )}
-                    </>
-                )}
-            </div>
+  // --- Step 3: fetch members of selected team ---
+  const {
+    data: teamMembersResp,
+    isLoading: teamMembersLoading,
+    error: teamMembersError,
+  } = useFetchMembersByTeam(selectedTeam);
 
-            {/* Deadline */}
-            <div className="space-y-2">
-                <Label htmlFor="deadline">Deadline (Optional)</Label>
-                <Input 
-                    id="deadline" 
-                    name="deadline" 
-                    type="date" 
-                    min={new Date().toISOString().split('T')[0]}
-                />
-            </div>
+  const teamMembers = useMemo(() => {
+    if (!teamMembersResp?.data?.data) return [];
+    return Array.isArray(teamMembersResp.data.data)
+      ? teamMembersResp.data.data
+      : [];
+  }, [teamMembersResp]);
 
-            {/* Tags */}
-            <div className="space-y-2">
-                <Label htmlFor="tags">Tags (Optional)</Label>
-                <Input 
-                    id="tags" 
-                    name="tags" 
-                    placeholder="bug, ui, urgent, feature (comma separated)" 
-                />
-                <div className="text-xs text-gray-500">
-                    Add tags separated by commas to categorize your task
-                </div>
-            </div>
-        </div>
-    );
+  console.log(teamMembersResp,'team members of team')
+  const [selectedMember, setSelectedMember] = useState<string>("");
+
+  return (
+    <div className="space-y-6">
+      {/* Title */}
+      <div className="space-y-2">
+        <Label htmlFor="title">Title *</Label>
+        <Input id="title" name="title" placeholder="Enter task title" required />
+      </div>
+
+      {/* Description */}
+      <div className="space-y-2">
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          name="description"
+          placeholder="Enter task description"
+          rows={4}
+        />
+      </div>
+
+      {/* Select Team */}
+      <div className="space-y-2">
+        <Label htmlFor="team">Team *</Label>
+        {projectLoading ? (
+          <div className="text-sm text-gray-500 p-3 border rounded">Loading teams...</div>
+        ) : projectError ? (
+          <div className="text-sm text-red-500 p-3 border rounded bg-red-50">
+            Failed to load teams
+          </div>
+        ) : (
+          <Select value={selectedTeam} onValueChange={setSelectedTeam}>
+            <SelectTrigger id="team">
+              <SelectValue placeholder="Select a team" />
+            </SelectTrigger>
+            <SelectContent className="z-50 bg-white max-h-60 overflow-y-auto">
+              {projectTeams.map((team) => (
+                <SelectItem key={team._id} value={team._id}>
+                  {team.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
+
+      {/* Assign Member */}
+      <div className="space-y-2">
+        <Label htmlFor="assignedTo">Assign To (Optional)</Label>
+        {teamMembersLoading ? (
+          <div className="text-sm text-gray-500 p-3 border rounded">
+            Loading team members...
+          </div>
+        ) : teamMembersError ? (
+          <div className="text-sm text-red-500 p-3 border rounded bg-red-50">
+            Failed to load members
+          </div>
+        ) : (
+          <Select value={selectedMember} onValueChange={setSelectedMember}>
+            <SelectTrigger id="assignedTo">
+              <SelectValue placeholder="Select a team member" />
+            </SelectTrigger>
+            <SelectContent className="z-50 bg-white max-h-60 overflow-y-auto">
+              <SelectItem value="unassigned">Unassigned</SelectItem>
+              {teamMembers.map((member) => (
+                <SelectItem key={member._id} value={member._id}>
+                  {member.username} ({member.email})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
+
+      {/* Deadline */}
+      <div className="space-y-2">
+        <Label htmlFor="deadline">Deadline (Optional)</Label>
+        <Input
+          id="deadline"
+          name="deadline"
+          type="date"
+          min={new Date().toISOString().split("T")[0]}
+        />
+      </div>
+
+      {/* Tags */}
+      <div className="space-y-2">
+        <Label htmlFor="tags">Tags (Optional)</Label>
+        <Input id="tags" name="tags" placeholder="bug, ui, urgent (comma separated)" />
+        <div className="text-xs text-gray-500">Add tags separated by commas</div>
+      </div>
+    </div>
+  );
 };
