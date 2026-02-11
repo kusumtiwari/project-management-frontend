@@ -8,25 +8,28 @@ export type TaskItem = {
   _id: string;
   title: string;
   description?: string;
-  status: "backlog" | "in-progress" | "done" | "deployed" | "review";
+  status: "backlog" | "in-progress" | "done" | "deployed" | "review" | "blocked";
   deadline?: string;
   assignedTo?: { name?: string };
+  priority?: "low" | "medium" | "high" | "urgent";
 };
 
-export type KanbanColumnKey = "backlog" | "in-progress" | "done" | "deployed";
+export type KanbanColumnKey = "backlog" | "in-progress" | "review" | "done" | "deployed";
 
 const STATUS_TO_LABEL: Record<KanbanColumnKey, string> = {
   "backlog": "To-Dos",
-  "in-progress": "Doing",
+  "in-progress": "In Progress",
+  "review": "Review",
   "done": "Completed",
   "deployed": "Deployed",
 };
 
-const STATUS_BADGE_VARIANT: Record<KanbanColumnKey, "secondary" | "default" | "success"> = {
+const STATUS_BADGE_VARIANT: Record<KanbanColumnKey, "secondary" | "default" | "outline"> = {
   "backlog": "secondary",
   "in-progress": "default",
-  "done": "success",
-  "deployed": "success",
+  "review": "outline",
+  "done": "secondary",
+  "deployed": "secondary",
 };
 
 interface KanbanBoardProps {
@@ -42,15 +45,19 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, onMove, onCardC
     const groups: Record<KanbanColumnKey, TaskItem[]> = {
       backlog: [],
       "in-progress": [],
+      review: [],
       done: [],
       deployed: [],
     };
     for (const t of tasks) {
-      if (t.status === "backlog" || t.status === "in-progress" || t.status === "done" || t.status === "deployed") {
+      if (t.status === "backlog" || t.status === "in-progress" || t.status === "review" || t.status === "done" || t.status === "deployed") {
         groups[t.status].push(t);
+      } else if (t.status === "blocked") {
+        // Show blocked tasks in review column for now
+        groups["review"].push(t);
       } else {
-        // If status like 'review' exists, show it in Doing for now
-        groups["in-progress"].push(t);
+        // Fallback for any unknown status
+        groups["backlog"].push(t);
       }
     }
     return groups;
@@ -77,18 +84,18 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, onMove, onCardC
   console.log(tasks,'tasks here')
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div className="flex flex-row gap-4 overflow-auto max-w-[80vw] max-h-[80vh] p-4">
       {(Object.keys(columns) as KanbanColumnKey[]).map((colKey) => (
-        <div key={colKey} className="bg-slate-50 rounded-xl p-3 border dark:bg-neutral-900 dark:border-neutral-800"
+        <div key={colKey} className="bg-slate-50 rounded-xl p-3 border min-w-[22vw] flex-shrink-0"
              onDragOver={handleDragOver}
              onDrop={(e) => handleDrop(e, colKey)}>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold dark:text-gray-200">{STATUS_TO_LABEL[colKey]}</h3>
+            <h3 className="text-sm font-semibold">{STATUS_TO_LABEL[colKey]}</h3>
             <Badge variant={STATUS_BADGE_VARIANT[colKey]}>{columns[colKey].length}</Badge>
           </div>
           <div className="space-y-3 min-h-[200px]">
             {columns[colKey].length === 0 ? (
-              <div className="p-3 bg-white rounded-lg border text-center text-xs text-muted-foreground dark:bg-neutral-800 dark:border-neutral-700 dark:text-gray-400">
+              <div className="p-3 bg-white rounded-lg border text-center text-xs text-muted-foreground">
                 No tasks in {STATUS_TO_LABEL[colKey]}
               </div>
             ) : null}
@@ -97,16 +104,36 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, onMove, onCardC
                    draggable
                    onDragStart={(e) => handleDragStart(e, t._id)}
                    onClick={() => onCardClick?.(t)}
-                   className="rounded-lg border bg-white p-3 shadow-sm cursor-grab active:cursor-grabbing dark:bg-neutral-800 dark:border-neutral-700">
-                <div className="text-sm font-medium dark:text-gray-100">{t.title}</div>
+                   className="rounded-lg border bg-white p-3 shadow-sm cursor-grab active:cursor-grabbing">
+                <div className="flex items-start justify-between">
+                  <div className="text-sm font-medium flex-1">{t.title}</div>
+                  {t.priority && (
+                    <div className="ml-2">
+                      {t.priority === 'urgent' && <span className="text-red-500 text-xs">🔴</span>}
+                      {t.priority === 'high' && <span className="text-orange-500 text-xs">🟠</span>}
+                      {t.priority === 'medium' && <span className="text-yellow-500 text-xs">🟡</span>}
+                      {t.priority === 'low' && <span className="text-green-500 text-xs">🟢</span>}
+                    </div>
+                  )}
+                </div>
                 {t.description ? (
-                  <div className="text-xs text-muted-foreground mt-1 line-clamp-2 dark:text-gray-400">
+                  <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
                     {t.description}
                   </div>
                 ) : null}
                 <div className="mt-2 flex items-center justify-between">
-                  <Badge variant={STATUS_BADGE_VARIANT[colKey]}>{STATUS_TO_LABEL[colKey]}</Badge>
-                  <span className="text-[11px] text-muted-foreground dark:text-gray-400">
+                  <div className="flex items-center gap-1">
+                    {t.assignedTo ? (
+                      <div className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                        {t.assignedTo.name}
+                      </div>
+                    ) : (
+                      <div className="text-[10px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded">
+                        Unassigned
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[11px] text-muted-foreground">
                     {t.deadline ? new Date(t.deadline).toLocaleDateString() : ''}
                   </span>
                 </div>

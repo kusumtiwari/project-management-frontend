@@ -35,10 +35,10 @@ const ModalForm: React.FC<ModalFormProps> = ({
                     <div className="mt-4 overflow-y-auto flex-1 pr-4">{children}</div>
 
                     <DialogFooter className="mt-6 flex gap-2 justify-end flex-shrink-0">
-                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                        <Button type="button" variant="destructive" onClick={() => onOpenChange(false)}>
                             Cancel
                         </Button>
-                        <Button type="submit" variant='secondary'>Submit</Button>
+                        <Button type="submit" variant='primary'>Submit</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

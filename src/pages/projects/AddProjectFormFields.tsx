@@ -1,165 +1,209 @@
-// AddProjectFormFields.tsx
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { useEffect, useMemo, useState } from "react";
-import { useFetchTeamMembers, useFetchMembersByTeam } from "../team/useTeamMembersActions";
+import { useFetchTeamMembers } from "../team/useTeamMembersActions";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+interface AddProjectFormFieldsProps {
+  defaultValues?: any;
+}
 
-export const AddProjectFormFields = () => {
-    const [selectedTeamId, setSelectedTeamId] = useState<string>("");
-    const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+export const AddProjectFormFields: React.FC<
+  AddProjectFormFieldsProps
+> = ({ defaultValues }) => {
+  const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
+  const [currentTeamId, setCurrentTeamId] = useState<string>("");
 
-    // Fetch all teams
-    const { data: teamsResp } = useFetchTeamMembers();
-    const teams = useMemo(() => (teamsResp as any)?.data?.data || [], [teamsResp]);
+  const { data: teamsResp } = useFetchTeamMembers();
+  const teams = useMemo(
+    () => (teamsResp as any)?.data?.data || [],
+    [teamsResp]
+  );
 
-    // Fetch members for selected team
-    const { data: membersResp } = useFetchMembersByTeam(selectedTeamId);
-    const members = useMemo(() => (membersResp as any)?.data?.data || [], [membersResp]);
+  // ✅ Prefill teams when editing
+  useEffect(() => {
+    if (defaultValues?.teams?.length) {
+      const teamIds = defaultValues.teams.map(
+        (t: any) => t.teamId?._id || t._id
+      );
+      setSelectedTeams(teamIds);
+    }
+  }, [defaultValues]);
 
-    // Auto-select first team if available
-    useEffect(() => {
-        if (!selectedTeamId && teams?.length > 0) {
-            setSelectedTeamId(teams[0]._id);
-        }
-    }, [teams, selectedTeamId]);
+  // ✅ Only auto-select first team if NOT editing
+  useEffect(() => {
+    if (!defaultValues && selectedTeams.length === 0 && teams.length > 0) {
+      setSelectedTeams([teams[0]._id]);
+    }
+  }, [teams, defaultValues]);
 
-    const handleTeamChange = (teamId: string) => {
-        setSelectedTeamId(teamId);
-        setSelectedMembers([]); // Reset selected members when team changes
-    };
+  const addTeam = (teamId: string) => {
+    if (teamId && !selectedTeams.includes(teamId)) {
+      setSelectedTeams((prev) => [...prev, teamId]);
+      setCurrentTeamId("");
+    }
+  };
 
-    const toggleMember = (memberId: string) => {
-        setSelectedMembers((prev) =>
-            prev.includes(memberId)
-                ? prev.filter((id) => id !== memberId)
-                : [...prev, memberId]
-        );
-    };
+  const removeTeam = (teamId: string) => {
+    setSelectedTeams((prev) => prev.filter((id) => id !== teamId));
+  };
 
-    const toggleSelectAll = () => {
-        if (selectedMembers.length === members.length) {
-            setSelectedMembers([]);
-        } else {
-            setSelectedMembers(members.map((m: any) => m._id));
-        }
-    };
+  const getTeamName = (teamId: string) =>
+    teams.find((t: any) => t._id === teamId)?.name || "Unknown Team";
 
-    return (
-        <div className="space-y-4 mt-4">
-            <div className="space-y-3">
-                <Label htmlFor="name">Project Name</Label>
-                <Input
-                    id="name"
-                    name="name"
-                    placeholder="Enter project name"
-                    required
-                />
-            </div>
+  const availableTeams = teams.filter(
+    (t: any) => !selectedTeams.includes(t._id)
+  );
 
-            <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                    id="description"
-                    name="description"
-                    placeholder="Enter project description"
-                    rows={3}
-                />
-            </div>
+  return (
+    <div className="space-y-6 mt-4">
+      {/* Project Info */}
+      <div className="rounded-xl bg-white space-y-4">
+        <h3 className="text-lg font-semibold">Project Information</h3>
 
-            <div className="space-y-3 bg-white z-50 ">
-                <Label htmlFor="teamId">Select Team *</Label>
-                <Select
-                    name="teamId"
-                    value={selectedTeamId}
-                    onValueChange={handleTeamChange}
-                    required
-            
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Choose a team" />
-                    </SelectTrigger>
-                    <SelectContent className="z-[9999]">
-                        {teams.map((team: any) => (
-                            <SelectItem key={team._id} value={team._id}>
-                                {team.name}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
-
-            {selectedTeamId && members.length > 0 && (
-                <div className="space-y-3 relative z-40">
-                    <div className="flex items-center justify-between">
-                        <Label>Assign Members (Optional)</Label>
-                        <button
-                            type="button"
-                            onClick={toggleSelectAll}
-                            className="text-xs text-blue-600 hover:underline"
-                        >
-                            {selectedMembers.length === members.length
-                                ? "Deselect All"
-                                : "Select All"}
-                        </button>
-                    </div>
-                    <div className="border rounded-md p-3 max-h-48 overflow-y-auto space-y-2 bg-white">
-                        {members.map((member: any) => (
-                            <div key={member._id} className="flex items-center space-x-2">
-                                <Checkbox
-                                    id={`member-${member._id}`}
-                                    checked={selectedMembers.includes(member._id)}
-                                    onCheckedChange={() => toggleMember(member._id)}
-                                />
-                                <label
-                                    htmlFor={`member-${member._id}`}
-                                    className="text-sm cursor-pointer flex-1"
-                                >
-                                    <div className="font-medium">{member.username}</div>
-                                    <div className="text-xs text-gray-500">
-                                        {member.email} • {member.role}
-                                    </div>
-                                </label>
-                            </div>
-                        ))}
-                    </div>
-                    <p className="text-xs text-gray-500">
-                        {selectedMembers.length} member(s) selected
-                    </p>
-                    {/* Hidden input to store selected members */}
-                    <input
-                        type="hidden"
-                        name="teamMembers"
-                        value={JSON.stringify(selectedMembers)}
-                    />
-                </div>
-            )}
-
-            <div className="space-y-3 relative z-40">
-                <Label htmlFor="status">Status</Label>
-                <Select name="status" defaultValue="Not Started">
-                    <SelectTrigger>
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="z-[9999]">
-                        <SelectItem value="Not Started">Not Started</SelectItem>
-                        <SelectItem value="In Progress">In Progress</SelectItem>
-                        <SelectItem value="Completed">Completed</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-            <div className="space-y-3">
-                <Label htmlFor="deadline">Deadline</Label>
-                <Input id="deadline" name="deadline" type="date" />
-            </div>
+        <div className="space-y-3">
+          <Label htmlFor="name">Project Name</Label>
+          <Input
+            id="name"
+            name="name"
+            placeholder="Enter project name"
+            defaultValue={defaultValues?.name || ""}
+            required
+          />
         </div>
-    );
+
+        <div className="space-y-3">
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            name="description"
+            placeholder="Enter project description"
+            rows={3}
+            defaultValue={defaultValues?.description || ""}
+          />
+        </div>
+      </div>
+
+      {/* Teams Selection */}
+      <div className="rounded-xl bg-white space-y-4">
+        <h3 className="text-lg font-semibold">Teams</h3>
+
+        {selectedTeams.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {selectedTeams.map((teamId: string) => (
+              <div
+                key={teamId}
+                className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm"
+              >
+                <span>{getTeamName(teamId)}</span>
+                <button
+                  type="button"
+                  onClick={() => removeTeam(teamId)}
+                  className="hover:bg-blue-200 rounded-full p-0.5"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {availableTeams.length > 0 && (
+          <div className="flex gap-2 mt-2">
+            <Select value={currentTeamId} onValueChange={setCurrentTeamId}>
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Select a team" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableTeams.map((team: any) => (
+                  <SelectItem key={team._id} value={team._id}>
+                    {team.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => addTeam(currentTeamId)}
+              disabled={!currentTeamId}
+            >
+              Add
+            </Button>
+          </div>
+        )}
+
+        <input
+          type="hidden"
+          name="teams"
+          value={JSON.stringify(selectedTeams)}
+          required
+        />
+      </div>
+
+      {/* Status & Priority */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-3">
+          <Label>Status</Label>
+          <Select
+            name="status"
+            defaultValue={defaultValues?.status || "Not Started"}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Not Started">Not Started</SelectItem>
+              <SelectItem value="Planning">Planning</SelectItem>
+              <SelectItem value="In Progress">In Progress</SelectItem>
+              <SelectItem value="On Hold">On Hold</SelectItem>
+              <SelectItem value="Completed">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-3">
+          <Label>Priority</Label>
+          <Select
+            name="priority"
+            defaultValue={defaultValues?.priority || "medium"}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="low">Low</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="high">High</SelectItem>
+              <SelectItem value="urgent">Urgent</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Deadline */}
+      <div className="space-y-3">
+        <Label htmlFor="deadline">Deadline</Label>
+        <Input
+          id="deadline"
+          name="deadline"
+          type="date"
+          defaultValue={
+            defaultValues?.deadline
+              ? defaultValues.deadline.split("T")[0]
+              : ""
+          }
+        />
+      </div>
+    </div>
+  );
 };
