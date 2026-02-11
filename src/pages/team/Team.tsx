@@ -66,8 +66,8 @@ const TeamMembers: React.FC<Props> = ({ }) => {
     <div className='space-y-4'>
       <Header text='Team Members' rightContent={
         <div className='flex gap-2'>
-          <Button variant="outline" size="sm" onClick={openTeamModal}>Create Team</Button>
-          <Button variant="secondary" size="sm" onClick={openModal}>Add Team Member</Button>
+          <Button variant="primary" size="sm" onClick={openTeamModal}>Create Team</Button>
+          <Button variant="success" size="sm" onClick={openModal}>Add Team Member</Button>
         </div>
       } />
 
@@ -84,7 +84,7 @@ const TeamMembers: React.FC<Props> = ({ }) => {
                     <option key={t._id} value={t._id}>{t.name}</option>
                   ))}
                 </select>
-                <span className='text-sm text-gray-600 dark:text-gray-300'>Members: {members.length}</span>
+                <span className='text-sm text-gray-600'>Members: {members.length}</span>
               </div>
       }
       

@@ -35,7 +35,7 @@ export const useModalForm = ({ formTitle, submitHandler, FormFields }: UseModalF
                         <Button type="button" variant="outline" onClick={closeModal}>
                             Cancel
                         </Button>
-                        <Button type="submit">Submit</Button>
+                        <Button type="submit" variant='primary'>Submit</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

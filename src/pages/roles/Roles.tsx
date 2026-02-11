@@ -1,27 +1,45 @@
-import React from 'react';
-import Header from '@/components/elements/heading/Header';
-import { Button } from '@/components/ui/button';
-import { useModal } from '@/hooks/useModal';
-import { useCreateRole, useDeleteRole, useFetchPermissionList, useFetchRoles, useUpdateRole } from './useRoleActions';
-import useRoleStore from './useRoleStore';
-import ModalForm from '@/components/ui/ModalForm';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import NoData from '@/components/elements/no-data/NoData';
+import React from "react";
+import Header from "@/components/elements/heading/Header";
+import { Button } from "@/components/ui/button";
+import { useModal } from "@/hooks/useModal";
+import {
+  useCreateRole,
+  useDeleteRole,
+  useFetchPermissionList,
+  useFetchRoles,
+  useUpdateRole,
+} from "./useRoleActions";
+import useRoleStore from "./useRoleStore";
+import ModalForm from "@/components/ui/ModalForm";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import NoData from "@/components/elements/no-data/NoData";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 
 type Props = {
   // Define your props here
-}
+};
 
-const Roles: React.FC<Props> = ({ }) => {
+const Roles: React.FC<Props> = ({}) => {
   const { isOpen, openModal, closeModal, setIsOpen } = useModal();
   useFetchPermissionList();
   useFetchRoles();
+
   const permissionList = useRoleStore((state: any) => state?.permissions);
-  const roles = useRoleStore((state:any) => state.roles);
+  const roles = useRoleStore((state: any) => state.roles);
   const { mutate: createRole } = useCreateRole();
   const { mutate: updateRole } = useUpdateRole();
   const { mutate: deleteRole } = useDeleteRole();
+
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [selectedRole, setSelectedRole] = React.useState<any>(null);
 
   type Mode = "add" | "edit";
 
@@ -34,16 +52,13 @@ const Roles: React.FC<Props> = ({ }) => {
 
     const roleName = String(formData.get("roleName") || "").trim();
     const permissions = permissionList.filter(
-      (p: string) => formData.get(p) === "on"
+      (p: string) => formData.get(p) === "on",
     );
 
     if (!roleName || permissions.length === 0) return;
 
     if (mode === "add") {
-      createRole(
-        { roleName, permissions },
-        { onSuccess: () => closeModal() }
-      );
+      createRole({ roleName, permissions }, { onSuccess: () => closeModal() });
     }
 
     if (mode === "edit" && editing) {
@@ -53,11 +68,10 @@ const Roles: React.FC<Props> = ({ }) => {
           roleName,
           permissions,
         },
-        { onSuccess: () => closeModal() }
+        { onSuccess: () => closeModal() },
       );
     }
   };
-
 
   const handleAdd = () => {
     setMode("add");
@@ -71,13 +85,12 @@ const Roles: React.FC<Props> = ({ }) => {
     openModal();
   };
 
-
   return (
     <div>
       <Header
         text="Roles"
         rightContent={
-          <Button onClick={handleAdd} size="sm">
+          <Button onClick={handleAdd} size="sm" variant='primary'>
             Add Role
           </Button>
         }
@@ -87,35 +100,48 @@ const Roles: React.FC<Props> = ({ }) => {
       {roles?.length === 0 ? (
         <NoData />
       ) : (
-        <div className="mt-4 rounded-2xl border bg-white shadow-sm dark:bg-neutral-900 dark:border-neutral-800">
-          <Table className="text-gray-900 dark:text-gray-100">
+        <div className="mt-4 rounded-2xl border bg-white shadow-sm">
+          <Table className="text-gray-900">
             <TableHeader>
-              <TableRow className="dark:hover:bg-neutral-900">
-                <TableHead className="dark:text-gray-300">Role</TableHead>
-                <TableHead className="dark:text-gray-300">Permissions</TableHead>
-                <TableHead className="dark:text-gray-300">Created</TableHead>
-                <TableHead className="dark:text-gray-300">Actions</TableHead>
+              <TableRow>
+                <TableHead>Role</TableHead>
+                <TableHead>Permissions</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {roles.map((r:any) => (
-                <TableRow key={r._id} className="dark:hover:bg-neutral-800/60">
-                  <TableCell className="font-medium dark:text-gray-100">{r.roleName}</TableCell>
-                  <TableCell className="dark:text-gray-200">{Array.isArray(r.permissions) ? r.permissions.length : 0}</TableCell>
-                  <TableCell className="dark:text-gray-200">{r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '—'}</TableCell>
-                  <TableCell className="dark:text-gray-200">
+              {roles.map((r: any) => (
+                <TableRow key={r._id}>
+                  <TableCell className="font-medium">{r.roleName}</TableCell>
+                  <TableCell>
+                    {Array.isArray(r.permissions) ? r.permissions.length : 0}
+                  </TableCell>
+                  <TableCell>
+                    {r.createdAt
+                      ? new Date(r.createdAt).toLocaleDateString()
+                      : "—"}
+                  </TableCell>
+                  <TableCell>
                     <div className="flex items-center gap-2">
                       <Button
-                        variant="outline"
+                        variant="success"
                         size="sm"
                         onClick={() => handleEdit(r)}
                       >
                         Edit
                       </Button>
 
-                      <Button variant="destructive" size="sm" onClick={() => {
-                        if (confirm(`Delete role "${r.roleName}"?`)) deleteRole(r._id);
-                      }}>Delete</Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedRole(r);
+                          setDeleteOpen(true);
+                        }}
+                      >
+                        Delete
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -128,7 +154,9 @@ const Roles: React.FC<Props> = ({ }) => {
       <ModalForm
         open={isOpen}
         onOpenChange={setIsOpen}
-        formTitle={mode === "add" ? "Create Role" : `Edit Role: ${editing?.roleName}`}
+        formTitle={
+          mode === "add" ? "Create Role" : `Edit Role: ${editing?.roleName}`
+        }
         submitHandler={submitHandler}
       >
         <div className="space-y-4">
@@ -154,7 +182,9 @@ const Roles: React.FC<Props> = ({ }) => {
                     type="checkbox"
                     name={perm}
                     defaultChecked={
-                      mode === "edit" ? editing?.permissions?.includes(perm) : false
+                      mode === "edit"
+                        ? editing?.permissions?.includes(perm)
+                        : false
                     }
                   />
                   <span>{perm}</span>
@@ -165,6 +195,26 @@ const Roles: React.FC<Props> = ({ }) => {
         </div>
       </ModalForm>
 
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="Delete Role"
+        description={`Are you sure you want to delete "${selectedRole?.roleName}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        destructive
+        // loading={isDeleting}
+        onConfirm={() => {
+          if (!selectedRole) return;
+
+          deleteRole(selectedRole._id, {
+            onSuccess: () => {
+              setDeleteOpen(false);
+              setSelectedRole(null);
+            },
+          });
+        }}
+      />
     </div>
   );
 };

@@ -12,23 +12,38 @@ import { useEffect, useMemo, useState } from "react";
 import { useFetchTeamMembers } from "../team/useTeamMembersActions";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+interface AddProjectFormFieldsProps {
+  defaultValues?: any;
+}
 
-export const AddProjectFormFields: React.FC = () => {
+export const AddProjectFormFields: React.FC<
+  AddProjectFormFieldsProps
+> = ({ defaultValues }) => {
   const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
   const [currentTeamId, setCurrentTeamId] = useState<string>("");
 
-  // Fetch all teams
   const { data: teamsResp } = useFetchTeamMembers();
   const teams = useMemo(
     () => (teamsResp as any)?.data?.data || [],
     [teamsResp]
   );
 
+  // ✅ Prefill teams when editing
   useEffect(() => {
-    if (selectedTeams.length === 0 && teams.length > 0) {
+    if (defaultValues?.teams?.length) {
+      const teamIds = defaultValues.teams.map(
+        (t: any) => t.teamId?._id || t._id
+      );
+      setSelectedTeams(teamIds);
+    }
+  }, [defaultValues]);
+
+  // ✅ Only auto-select first team if NOT editing
+  useEffect(() => {
+    if (!defaultValues && selectedTeams.length === 0 && teams.length > 0) {
       setSelectedTeams([teams[0]._id]);
     }
-  }, [teams]);
+  }, [teams, defaultValues]);
 
   const addTeam = (teamId: string) => {
     if (teamId && !selectedTeams.includes(teamId)) {
@@ -51,17 +66,20 @@ export const AddProjectFormFields: React.FC = () => {
   return (
     <div className="space-y-6 mt-4">
       {/* Project Info */}
-      <div className="p-4 border rounded-xl bg-white space-y-4">
+      <div className="rounded-xl bg-white space-y-4">
         <h3 className="text-lg font-semibold">Project Information</h3>
+
         <div className="space-y-3">
           <Label htmlFor="name">Project Name</Label>
           <Input
             id="name"
             name="name"
             placeholder="Enter project name"
+            defaultValue={defaultValues?.name || ""}
             required
           />
         </div>
+
         <div className="space-y-3">
           <Label htmlFor="description">Description</Label>
           <Textarea
@@ -69,13 +87,15 @@ export const AddProjectFormFields: React.FC = () => {
             name="description"
             placeholder="Enter project description"
             rows={3}
+            defaultValue={defaultValues?.description || ""}
           />
         </div>
       </div>
 
       {/* Teams Selection */}
-      <div className="p-4 border rounded-xl bg-white space-y-4">
+      <div className="rounded-xl bg-white space-y-4">
         <h3 className="text-lg font-semibold">Teams</h3>
+
         {selectedTeams.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {selectedTeams.map((teamId: string) => (
@@ -110,6 +130,7 @@ export const AddProjectFormFields: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
+
             <Button
               type="button"
               variant="outline"
@@ -131,9 +152,12 @@ export const AddProjectFormFields: React.FC = () => {
 
       {/* Status & Priority */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-4 border rounded-xl bg-white space-y-3">
-          <Label htmlFor="status">Status</Label>
-          <Select name="status" defaultValue="Not Started">
+        <div className="space-y-3">
+          <Label>Status</Label>
+          <Select
+            name="status"
+            defaultValue={defaultValues?.status || "Not Started"}
+          >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -147,9 +171,12 @@ export const AddProjectFormFields: React.FC = () => {
           </Select>
         </div>
 
-        <div className="p-4 border rounded-xl bg-white space-y-3">
-          <Label htmlFor="priority">Priority</Label>
-          <Select name="priority" defaultValue="medium">
+        <div className="space-y-3">
+          <Label>Priority</Label>
+          <Select
+            name="priority"
+            defaultValue={defaultValues?.priority || "medium"}
+          >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -164,9 +191,18 @@ export const AddProjectFormFields: React.FC = () => {
       </div>
 
       {/* Deadline */}
-      <div className="p-4 border rounded-xl bg-white space-y-3">
+      <div className="space-y-3">
         <Label htmlFor="deadline">Deadline</Label>
-        <Input id="deadline" name="deadline" type="date" />
+        <Input
+          id="deadline"
+          name="deadline"
+          type="date"
+          defaultValue={
+            defaultValues?.deadline
+              ? defaultValues.deadline.split("T")[0]
+              : ""
+          }
+        />
       </div>
     </div>
   );
